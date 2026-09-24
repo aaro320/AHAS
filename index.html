@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+          content="width=device-width,
+                   initial-scale=1.0,
+                   maximum-scale=1.0,
+                   user-scalable=no">
 
     <title>Snake Game</title>
 
@@ -14,74 +19,109 @@
 
 <div class="app">
 
-    <!-- START SCREEN -->
+    <!-- =========================
+         HOME / START SCREEN
+    ========================== -->
+
     <section id="setupScreen" class="screen">
 
         <div class="card">
 
             <h1>🐍 Snake Game</h1>
+
             <p class="subtitle">
                 Choose your snake and start playing!
             </p>
+
 
             <label for="snakeName">
                 Snake Name
             </label>
 
             <input
-                type="text"
                 id="snakeName"
+                type="text"
                 maxlength="15"
                 value="Player"
                 placeholder="Enter snake name"
             >
 
+
             <label>
                 Snake Color
             </label>
 
+
             <div class="colors">
 
-                <button class="color-btn selected"
-                        data-color="#ff69b4"
-                        style="--c:#ff69b4"></button>
+                <button
+                    class="color-btn selected"
+                    data-color="#ff69b4"
+                    style="--c:#ff69b4"
+                    aria-label="Pink">
+                </button>
 
-                <button class="color-btn"
-                        data-color="#2ecc71"
-                        style="--c:#2ecc71"></button>
+                <button
+                    class="color-btn"
+                    data-color="#2ecc71"
+                    style="--c:#2ecc71"
+                    aria-label="Green">
+                </button>
 
-                <button class="color-btn"
-                        data-color="#3498db"
-                        style="--c:#3498db"></button>
+                <button
+                    class="color-btn"
+                    data-color="#3498db"
+                    style="--c:#3498db"
+                    aria-label="Blue">
+                </button>
 
-                <button class="color-btn"
-                        data-color="#e74c3c"
-                        style="--c:#e74c3c"></button>
+                <button
+                    class="color-btn"
+                    data-color="#e74c3c"
+                    style="--c:#e74c3c"
+                    aria-label="Red">
+                </button>
 
-                <button class="color-btn"
-                        data-color="#8e44ad"
-                        style="--c:#8e44ad"></button>
+                <button
+                    class="color-btn"
+                    data-color="#8e44ad"
+                    style="--c:#8e44ad"
+                    aria-label="Violet">
+                </button>
 
-                <button class="color-btn"
-                        data-color="#f1c40f"
-                        style="--c:#f1c40f"></button>
+                <button
+                    class="color-btn"
+                    data-color="#f1c40f"
+                    style="--c:#f1c40f"
+                    aria-label="Yellow">
+                </button>
 
-                <button class="color-btn"
-                        data-color="#f39c12"
-                        style="--c:#f39c12"></button>
+                <button
+                    class="color-btn"
+                    data-color="#f39c12"
+                    style="--c:#f39c12"
+                    aria-label="Orange">
+                </button>
 
             </div>
 
-            <button id="startBtn" class="primary">
+
+            <button
+                id="startBtn"
+                class="primary">
                 Start Game
             </button>
 
-            <button id="leaderboardBtn" class="secondary">
+
+            <button
+                id="leaderboardBtn"
+                class="secondary">
                 🏆 Leaderboard
             </button>
 
+
             <p class="tip">
-                Swipe the screen to control the snake.
+                Swipe the game board to control the snake.
             </p>
 
         </div>
@@ -89,20 +129,28 @@
     </section>
 
 
-    <!-- GAME SCREEN -->
-    <section id="gameScreen" class="screen hidden">
+    <!-- =========================
+         GAME SCREEN
+    ========================== -->
+
+    <section id="gameScreen"
+             class="screen hidden">
+
 
         <div class="game-header">
 
             <div>
-                🐍 <span id="displayName">
+                🐍
+                <span id="displayName">
                     Player
                 </span>
             </div>
 
             <div>
                 Score:
-                <span id="score">0</span>
+                <span id="score">
+                    0
+                </span>
             </div>
 
         </div>
@@ -112,64 +160,6 @@
 
             <canvas id="gameCanvas"></canvas>
 
-            <div id="pauseOverlay"
-                 class="overlay hidden">
-
-                <div class="overlay-box">
-
-                    <h2>Paused</h2>
-
-                    <button id="resumeBtn"
-                            class="primary">
-                        Resume
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- MOBILE CONTROLS -->
-
-        <div class="controls">
-
-            <button id="upBtn">
-                ▲
-            </button>
-
-            <div>
-
-                <button id="leftBtn">
-                    ◀
-                </button>
-
-                <button id="downBtn">
-                    ▼
-                </button>
-
-                <button id="rightBtn">
-                    ▶
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <div class="game-buttons">
-
-            <button id="pauseBtn"
-                    class="secondary">
-                Pause
-            </button>
-
-            <button id="quitBtn"
-                    class="secondary">
-                Quit
-            </button>
-
         </div>
 
 
@@ -177,27 +167,41 @@
             ⚡ Power-up: none
         </div>
 
+
+        <p class="swipe-hint">
+            Swipe the board to move
+        </p>
+
     </section>
 
 
-    <!-- GAME OVER -->
+    <!-- =========================
+         GAME OVER SCREEN
+    ========================== -->
 
     <section id="gameOverScreen"
              class="screen hidden">
 
+
         <div class="card">
 
-            <h1>Game Over</h1>
+            <h1>
+                Game Over
+            </h1>
+
 
             <div id="finalScore"
                  class="big-score">
+
                 0
+
             </div>
+
 
             <p id="finalMessage"></p>
 
 
-            <!-- SONG -->
+            <!-- SONG INFORMATION -->
 
             <div class="song-card">
 
@@ -205,15 +209,19 @@
                     🎵
                 </div>
 
+
                 <div>
 
                     <div class="song-label">
                         Now Playing
                     </div>
 
+
                     <div id="songTitle"
                          class="song-title">
+
                         Song
+
                     </div>
 
                 </div>
@@ -221,24 +229,36 @@
             </div>
 
 
-            <audio id="deathAudio"
-                   controls>
+            <audio
+                id="deathAudio"
+                controls>
             </audio>
 
 
-            <button id="playAgainBtn"
-                    class="primary">
+            <button
+                id="playAgainBtn"
+                class="primary">
+
                 Play Again
+
             </button>
 
-            <button id="gameOverLeaderboardBtn"
-                    class="secondary">
+
+            <button
+                id="gameOverLeaderboardBtn"
+                class="secondary">
+
                 🏆 Leaderboard
+
             </button>
 
-            <button id="homeBtn"
-                    class="secondary">
+
+            <button
+                id="homeBtn"
+                class="secondary">
+
                 Home
+
             </button>
 
         </div>
@@ -246,25 +266,40 @@
     </section>
 
 
-    <!-- LEADERBOARD -->
+    <!-- =========================
+         LEADERBOARD
+    ========================== -->
 
     <div id="leaderboardModal"
          class="modal hidden">
 
+
         <div class="modal-card">
 
-            <button id="closeLeaderboard"
-                    class="close">
+
+            <button
+                id="closeLeaderboard"
+                class="close">
+
                 ×
+
             </button>
 
-            <h2>🏆 Leaderboard</h2>
+
+            <h2>
+                🏆 Leaderboard
+            </h2>
+
 
             <ol id="leaderboardList"></ol>
 
-            <button id="clearLeaderboard"
-                    class="danger">
+
+            <button
+                id="clearLeaderboard"
+                class="danger">
+
                 Clear Leaderboard
+
             </button>
 
         </div>
@@ -272,6 +307,7 @@
     </div>
 
 </div>
+
 
 <script src="script.js"></script>
 
