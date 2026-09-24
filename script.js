@@ -1,13 +1,12 @@
-const canvas =
-    document.getElementById("gameCanvas");
+/* =====================================================
+   SNAKE GAME
+   Mobile Swipe Version
+===================================================== */
 
-const ctx =
-    canvas.getContext("2d");
 
-
-/* =========================
-   GAME SETTINGS
-========================= */
+/* =====================================================
+   SETTINGS
+===================================================== */
 
 const GRID = 20;
 
@@ -16,9 +15,22 @@ const BASE_SPEED = 130;
 const POWERUP_DURATION = 5000;
 
 
-/* =========================
-   SONGS
-========================= */
+/* =====================================================
+   CANVAS
+===================================================== */
+
+const canvas =
+    document.getElementById(
+        "gameCanvas"
+    );
+
+const ctx =
+    canvas.getContext("2d");
+
+
+/* =====================================================
+   SONG LIST
+===================================================== */
 
 const SONGS = [
 
@@ -58,13 +70,17 @@ const SONGS = [
     },
 
     {
-        title: "Merry Christmas, I Miss You!",
-        file: "merry-christmas-i-miss-you.mp3"
+        title:
+            "Merry Christmas, I Miss You!",
+        file:
+            "merry-christmas-i-miss-you.mp3"
     },
 
     {
-        title: "Merry Christmas, Please Don't Call!",
-        file: "merry-christmas-please-dont-call.mp3"
+        title:
+            "Merry Christmas, Please Don't Call!",
+        file:
+            "merry-christmas-please-dont-call.mp3"
     },
 
     {
@@ -80,9 +96,9 @@ const SONGS = [
 ];
 
 
-/* =========================
-   VARIABLES
-========================= */
+/* =====================================================
+   GAME VARIABLES
+===================================================== */
 
 let snakeName = "Player";
 
@@ -94,21 +110,22 @@ let food = null;
 
 let powerup = null;
 
+
 let direction = {
     x: 1,
     y: 0
 };
+
 
 let nextDirection = {
     x: 1,
     y: 0
 };
 
+
 let score = 0;
 
 let running = false;
-
-let paused = false;
 
 let lastMove = 0;
 
@@ -116,61 +133,83 @@ let speed = BASE_SPEED;
 
 let powerupEnd = 0;
 
+
 let touchStartX = 0;
 
 let touchStartY = 0;
 
+
 let selectedSong = null;
 
 
-/* =========================
-   CANVAS SIZE
-========================= */
+/* =====================================================
+   CANVAS RESIZE
+===================================================== */
 
 function resizeCanvas() {
 
     const size =
         Math.min(
-            window.innerWidth - 20,
+            window.innerWidth - 14,
             600
         );
+
 
     const dpr =
         window.devicePixelRatio || 1;
 
+
     canvas.style.width =
         size + "px";
+
 
     canvas.style.height =
         size + "px";
 
+
     canvas.width =
-        Math.round(size * dpr);
+        Math.round(
+            size * dpr
+        );
+
 
     canvas.height =
-        Math.round(size * dpr);
+        Math.round(
+            size * dpr
+        );
+
 
     ctx.setTransform(
+
         dpr * size / GRID,
+
         0,
+
         0,
+
         dpr * size / GRID,
+
         0,
+
         0
+
     );
+
 }
+
 
 window.addEventListener(
     "resize",
     resizeCanvas
 );
 
+
 resizeCanvas();
 
 
-/* =========================
-   SCREEN
-========================= */
+/* =====================================================
+   SHOW SCREEN
+===================================================== */
 
 function show(id) {
 
@@ -184,6 +223,7 @@ function show(id) {
 
         });
 
+
     document
         .getElementById(id)
         .classList.remove(
@@ -192,26 +232,44 @@ function show(id) {
 }
 
 
-/* =========================
+/* =====================================================
    START GAME
-========================= */
+===================================================== */
 
 function startGame() {
 
     snakeName =
         document
-            .getElementById("snakeName")
+            .getElementById(
+                "snakeName"
+            )
             .value
-            .trim() || "Player";
+            .trim();
+
+
+    if (!snakeName) {
+
+        snakeName = "Player";
+
+    }
+
 
     snakeName =
-        snakeName.substring(0, 15);
+        snakeName.substring(
+            0,
+            15
+        );
 
 
     document
-        .getElementById("displayName")
-        .textContent = snakeName;
+        .getElementById(
+            "displayName"
+        )
+        .textContent =
+        snakeName;
 
+
+    /* Starting snake */
 
     snake = [
 
@@ -234,47 +292,63 @@ function startGame() {
 
 
     direction = {
+
         x: 1,
         y: 0
+
     };
 
 
     nextDirection = {
+
         x: 1,
         y: 0
+
     };
 
 
     score = 0;
 
-    speed = BASE_SPEED;
+
+    speed =
+        BASE_SPEED;
+
 
     powerup = null;
 
+
     powerupEnd = 0;
 
-    paused = false;
 
     running = true;
 
 
     document
-        .getElementById("score")
-        .textContent = score;
+        .getElementById(
+            "score"
+        )
+        .textContent =
+        score;
 
 
     document
-        .getElementById("powerupInfo")
+        .getElementById(
+            "powerupInfo"
+        )
         .textContent =
         "⚡ Power-up: none";
 
 
     spawnFood();
 
+
     spawnPowerupMaybe();
 
 
-    show("gameScreen");
+    show(
+        "gameScreen"
+    );
+
 
     resizeCanvas();
 
@@ -289,9 +363,9 @@ function startGame() {
 }
 
 
-/* =========================
-   FOOD
-========================= */
+/* =====================================================
+   SPAWN FOOD
+===================================================== */
 
 function spawnFood() {
 
@@ -301,12 +375,14 @@ function spawnFood() {
 
             x:
                 Math.floor(
-                    Math.random() * GRID
+                    Math.random() *
+                    GRID
                 ),
 
             y:
                 Math.floor(
-                    Math.random() * GRID
+                    Math.random() *
+                    GRID
                 )
 
         };
@@ -314,30 +390,39 @@ function spawnFood() {
     }
 
     while (
+
         snake.some(
+
             part =>
+
                 part.x === food.x &&
+
                 part.y === food.y
+
         )
+
     );
 }
 
 
-/* =========================
-   POWER UP
-========================= */
+/* =====================================================
+   SPAWN POWERUP
+===================================================== */
 
 function spawnPowerupMaybe() {
 
     /*
-       25% chance of power-up
+       25% chance
     */
 
-    if (Math.random() > 0.25) {
+    if (
+        Math.random() > 0.25
+    ) {
 
         powerup = null;
 
         return;
+
     }
 
 
@@ -350,19 +435,23 @@ function spawnPowerupMaybe() {
 
             x:
                 Math.floor(
-                    Math.random() * GRID
+                    Math.random() *
+                    GRID
                 ),
 
             y:
                 Math.floor(
-                    Math.random() * GRID
+                    Math.random() *
+                    GRID
                 ),
 
             type: "slow"
 
         };
 
+
         tries++;
+
 
     }
 
@@ -373,17 +462,29 @@ function spawnPowerupMaybe() {
         (
 
             snake.some(
+
                 part =>
-                    part.x === powerup.x &&
-                    part.y === powerup.y
+
+                    part.x ===
+                    powerup.x &&
+
+                    part.y ===
+                    powerup.y
+
             )
 
             ||
 
             (
+
                 food &&
-                food.x === powerup.x &&
-                food.y === powerup.y
+
+                food.x ===
+                powerup.x &&
+
+                food.y ===
+                powerup.y
+
             )
 
         )
@@ -392,45 +493,62 @@ function spawnPowerupMaybe() {
 }
 
 
-/* =========================
-   DIRECTION
-========================= */
+/* =====================================================
+   CHANGE DIRECTION
+===================================================== */
 
-function setDirection(x, y) {
+function setDirection(
+    x,
+    y
+) {
 
-    if (!running || paused)
+    if (!running)
         return;
 
 
     /*
-       Prevent going directly
-       backwards.
+       Prevent opposite direction.
     */
 
     if (
+
         x === -direction.x &&
+
         y === -direction.y
-    )
+
+    ) {
+
         return;
+
+    }
 
 
     if (
+
         x === -nextDirection.x &&
+
         y === -nextDirection.y
-    )
+
+    ) {
+
         return;
+
+    }
 
 
     nextDirection = {
+
         x: x,
+
         y: y
+
     };
 }
 
 
-/* =========================
-   UPDATE
-========================= */
+/* =====================================================
+   UPDATE GAME
+===================================================== */
 
 function update() {
 
@@ -455,9 +573,9 @@ function update() {
     };
 
 
-    /*
+    /* =================================
        WALL COLLISION
-    */
+    ================================= */
 
     if (
 
@@ -467,12 +585,33 @@ function update() {
 
         newHead.y < 0 ||
 
-        newHead.y >= GRID ||
+        newHead.y >= GRID
+
+    ) {
+
+        gameOver();
+
+        return;
+
+    }
+
+
+    /* =================================
+       SELF COLLISION
+    ================================= */
+
+    if (
 
         snake.some(
+
             part =>
-                part.x === newHead.x &&
-                part.y === newHead.y
+
+                part.x ===
+                newHead.x &&
+
+                part.y ===
+                newHead.y
+
         )
 
     ) {
@@ -480,17 +619,22 @@ function update() {
         gameOver();
 
         return;
+
     }
 
+
+    /*
+       Add new head
+    */
 
     snake.unshift(
         newHead
     );
 
 
-    /*
+    /* =================================
        FOOD
-    */
+    ================================= */
 
     if (
 
@@ -503,7 +647,7 @@ function update() {
     ) {
 
         /*
-           ONLY 1 POINT
+           EXACTLY ONE POINT
            PER FOOD
         */
 
@@ -511,11 +655,15 @@ function update() {
 
 
         document
-            .getElementById("score")
-            .textContent = score;
+            .getElementById(
+                "score"
+            )
+            .textContent =
+            score;
 
 
         spawnFood();
+
 
         spawnPowerupMaybe();
 
@@ -528,22 +676,24 @@ function update() {
     }
 
 
-    /*
-       POWER UP
-    */
+    /* =================================
+       POWERUP
+    ================================= */
 
     if (
 
         powerup &&
 
-        newHead.x === powerup.x &&
+        newHead.x ===
+        powerup.x &&
 
-        newHead.y === powerup.y
+        newHead.y ===
+        powerup.y
 
     ) {
 
         /*
-           Snake becomes slower
+           Slow snake
         */
 
         speed =
@@ -556,7 +706,9 @@ function update() {
 
 
         document
-            .getElementById("powerupInfo")
+            .getElementById(
+                "powerupInfo"
+            )
             .textContent =
             "🐌 Slow power-up active!";
 
@@ -568,9 +720,9 @@ function update() {
 }
 
 
-/* =========================
+/* =====================================================
    GAME LOOP
-========================= */
+===================================================== */
 
 function gameLoop(now) {
 
@@ -578,41 +730,59 @@ function gameLoop(now) {
         return;
 
 
-    if (!paused) {
+    /*
+       Check power-up timer
+    */
+
+    if (
+
+        powerupEnd &&
+
+        now >= powerupEnd
+
+    ) {
+
+        speed =
+            BASE_SPEED;
 
 
-        if (
-            powerupEnd &&
-            now >= powerupEnd
-        ) {
-
-            speed = BASE_SPEED;
-
-            powerupEnd = 0;
+        powerupEnd = 0;
 
 
-            document
-                .getElementById("powerupInfo")
-                .textContent =
-                "⚡ Power-up: none";
-
-        }
-
-
-        if (
-            now - lastMove >= speed
-        ) {
-
-            update();
-
-            lastMove = now;
-
-        }
-
-
-        draw();
+        document
+            .getElementById(
+                "powerupInfo"
+            )
+            .textContent =
+            "⚡ Power-up: none";
 
     }
+
+
+    /*
+       Move snake
+    */
+
+    if (
+
+        now - lastMove >= speed
+
+    ) {
+
+        update();
+
+
+        lastMove =
+            now;
+
+    }
+
+
+    /*
+       Draw
+    */
+
+    draw();
 
 
     requestAnimationFrame(
@@ -621,11 +791,15 @@ function gameLoop(now) {
 }
 
 
-/* =========================
-   DRAW
-========================= */
+/* =====================================================
+   DRAW GAME
+===================================================== */
 
 function draw() {
+
+    /*
+       Background
+    */
 
     ctx.clearRect(
         0,
@@ -635,12 +809,9 @@ function draw() {
     );
 
 
-    /*
-       BACKGROUND
-    */
-
     ctx.fillStyle =
         "#050509";
+
 
     ctx.fillRect(
         0,
@@ -651,13 +822,15 @@ function draw() {
 
 
     /*
-       GRID
+       Grid
     */
 
     ctx.strokeStyle =
         "rgba(255,255,255,.035)";
 
-    ctx.lineWidth = 0.03;
+
+    ctx.lineWidth =
+        0.03;
 
 
     for (
@@ -698,9 +871,9 @@ function draw() {
     }
 
 
-    /*
+    /* =================================
        FOOD
-    */
+    ================================= */
 
     if (food) {
 
@@ -710,22 +883,30 @@ function draw() {
 
         ctx.beginPath();
 
+
         ctx.arc(
-            food.x + .5,
-            food.y + .5,
-            .34,
+
+            food.x + 0.5,
+
+            food.y + 0.5,
+
+            0.34,
+
             0,
+
             Math.PI * 2
+
         );
+
 
         ctx.fill();
 
     }
 
 
-    /*
-       POWER UP
-    */
+    /* =================================
+       POWERUP
+    ================================= */
 
     if (powerup) {
 
@@ -735,13 +916,21 @@ function draw() {
 
         ctx.beginPath();
 
+
         ctx.arc(
-            powerup.x + .5,
-            powerup.y + .5,
-            .3,
+
+            powerup.x + 0.5,
+
+            powerup.y + 0.5,
+
+            0.30,
+
             0,
+
             Math.PI * 2
+
         );
+
 
         ctx.fill();
 
@@ -749,27 +938,35 @@ function draw() {
         ctx.fillStyle =
             "#06151a";
 
+
         ctx.font =
-            ".45px Arial";
+            "0.45px Arial";
+
 
         ctx.textAlign =
             "center";
 
+
         ctx.textBaseline =
             "middle";
 
+
         ctx.fillText(
+
             "S",
-            powerup.x + .5,
-            powerup.y + .5
+
+            powerup.x + 0.5,
+
+            powerup.y + 0.5
+
         );
 
     }
 
 
-    /*
+    /* =================================
        SNAKE
-    */
+    ================================= */
 
     snake.forEach(
         (part, index) => {
@@ -780,8 +977,8 @@ function draw() {
 
             const pad =
                 index === 0
-                    ? .04
-                    : .09;
+                    ? 0.04
+                    : 0.09;
 
 
             roundRect(
@@ -794,7 +991,7 @@ function draw() {
 
                 1 - pad * 2,
 
-                .18
+                0.18
 
             );
 
@@ -808,95 +1005,121 @@ function draw() {
 
             if (index === 0) {
 
-                ctx.fillStyle =
-                    "#fff";
-
-
-                const eye = .18;
-
-
-                let ex1 =
-                    part.x + .34;
-
-                let ex2 =
-                    part.x + .66;
-
-                let ey =
-                    part.y + .35;
-
-
-                if (direction.x !== 0) {
-
-                    ex1 =
-                        part.x +
-                        (
-                            direction.x > 0
-                                ? .68
-                                : .32
-                        );
-
-                    ex2 = ex1;
-
-                    ey =
-                        part.y + .35;
-
-                }
-
-                else {
-
-                    ey =
-                        part.y +
-                        (
-                            direction.y > 0
-                                ? .68
-                                : .32
-                        );
-
-                    ex1 =
-                        part.x + .35;
-
-                    ex2 =
-                        part.x + .65;
-
-                }
-
-
-                ctx.beginPath();
-
-                ctx.arc(
-                    ex1,
-                    ey,
-                    eye / 2,
-                    0,
-                    Math.PI * 2
+                drawSnakeEyes(
+                    part
                 );
-
-                ctx.fill();
-
-
-                ctx.beginPath();
-
-                ctx.arc(
-                    ex2,
-                    ey,
-                    eye / 2,
-                    0,
-                    Math.PI * 2
-                );
-
-                ctx.fill();
 
             }
 
         }
     );
-
 }
 
 
-/* =========================
-   ROUNDED SNAKE
-========================= */
+/* =====================================================
+   SNAKE EYES
+===================================================== */
+
+function drawSnakeEyes(part) {
+
+    ctx.fillStyle =
+        "#ffffff";
+
+
+    let eyeX1;
+
+    let eyeX2;
+
+    let eyeY;
+
+
+    if (direction.x !== 0) {
+
+        eyeX1 =
+            part.x +
+            (
+                direction.x > 0
+                    ? 0.70
+                    : 0.30
+            );
+
+
+        eyeX2 =
+            eyeX1;
+
+
+        eyeY =
+            part.y + 0.35;
+
+    }
+
+    else {
+
+        eyeY =
+            part.y +
+            (
+                direction.y > 0
+                    ? 0.70
+                    : 0.30
+            );
+
+
+        eyeX1 =
+            part.x + 0.35;
+
+
+        eyeX2 =
+            part.x + 0.65;
+
+    }
+
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+
+        eyeX1,
+
+        eyeY,
+
+        0.09,
+
+        0,
+
+        Math.PI * 2
+
+    );
+
+
+    ctx.fill();
+
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+
+        eyeX2,
+
+        eyeY,
+
+        0.09,
+
+        0,
+
+        Math.PI * 2
+
+    );
+
+
+    ctx.fill();
+}
+
+
+/* =====================================================
+   ROUNDED RECTANGLE
+===================================================== */
 
 function roundRect(
     x,
@@ -955,20 +1178,24 @@ function roundRect(
 }
 
 
-/* =========================
+/* =====================================================
    GAME OVER
-========================= */
+===================================================== */
 
 function gameOver() {
 
     running = false;
 
 
+    /*
+       Save score
+    */
+
     saveScore();
 
 
     /*
-       RANDOM SONG
+       Choose random song
     */
 
     selectedSong =
@@ -980,30 +1207,52 @@ function gameOver() {
         ];
 
 
-    document
-        .getElementById("finalScore")
-        .textContent = score;
+    /*
+       Display score
+    */
 
-
     document
-        .getElementById("finalMessage")
+        .getElementById(
+            "finalScore"
+        )
         .textContent =
-        `${snakeName} scored ${score} point${
-            score === 1 ? "" : "s"
+        score;
+
+
+    document
+        .getElementById(
+            "finalMessage"
+        )
+        .textContent =
+
+        `${snakeName} scored ${
+            score
+        } point${
+            score === 1
+                ? ""
+                : "s"
         }.`;
 
 
 
     /*
-       ONLY SONG TITLE
-       NO LYRICS
+       Display ONLY
+       song title.
+       
+       NO LYRICS.
     */
 
     document
-        .getElementById("songTitle")
+        .getElementById(
+            "songTitle"
+        )
         .textContent =
         selectedSong.title;
 
+
+    /*
+       Load MP3
+    */
 
     const audio =
         document.getElementById(
@@ -1016,8 +1265,13 @@ function gameOver() {
         selectedSong.file;
 
 
-    audio.currentTime = 0;
+    audio.currentTime =
+        0;
 
+
+    /*
+       Show game over
+    */
 
     show(
         "gameOverScreen"
@@ -1030,37 +1284,42 @@ function gameOver() {
 
     audio
         .play()
-        .catch(() => {
+        .catch(
+            () => {
 
-            /*
-               Some browsers block
-               automatic audio.
-            */
+                /*
+                   Mobile browsers may
+                   block automatic audio.
+                */
 
-        });
-
+            }
+        );
 }
 
 
-/* =========================
+/* =====================================================
    LEADERBOARD
-========================= */
+===================================================== */
 
 function saveScore() {
 
     const board =
         JSON.parse(
+
             localStorage.getItem(
                 "snakeLeaderboard"
             ) || "[]"
+
         );
 
 
     board.push({
 
-        name: snakeName,
+        name:
+            snakeName,
 
-        score: score,
+        score:
+            score,
 
         date:
             new Date()
@@ -1069,11 +1328,22 @@ function saveScore() {
     });
 
 
+    /*
+       Highest scores first
+    */
+
     board.sort(
+
         (a, b) =>
-            b.score - a.score
+            b.score -
+            a.score
+
     );
 
+
+    /*
+       Keep top 10
+    */
 
     localStorage.setItem(
 
@@ -1084,17 +1354,22 @@ function saveScore() {
         )
 
     );
-
 }
 
+
+/* =====================================================
+   DISPLAY LEADERBOARD
+===================================================== */
 
 function renderLeaderboard() {
 
     const board =
         JSON.parse(
+
             localStorage.getItem(
                 "snakeLeaderboard"
             ) || "[]"
+
         );
 
 
@@ -1107,50 +1382,61 @@ function renderLeaderboard() {
     list.innerHTML = "";
 
 
-    if (!board.length) {
+    if (
+        board.length === 0
+    ) {
 
         const li =
             document.createElement(
                 "li"
             );
 
+
         li.textContent =
             "No scores yet.";
 
-        list.appendChild(li);
+
+        list.appendChild(
+            li
+        );
+
 
         return;
     }
 
 
-    board.forEach(item => {
+    board.forEach(
+        item => {
 
-        const li =
-            document.createElement(
-                "li"
+            const li =
+                document.createElement(
+                    "li"
+                );
+
+
+            li.textContent =
+
+                `${item.name} — ${
+                    item.score
+                } point${
+                    item.score === 1
+                        ? ""
+                        : "s"
+                } (${item.date})`;
+
+
+            list.appendChild(
+                li
             );
 
-
-        li.textContent =
-            `${item.name} — ${
-                item.score
-            } point${
-                item.score === 1
-                    ? ""
-                    : "s"
-            } (${item.date})`;
-
-
-        list.appendChild(li);
-
-    });
-
+        }
+    );
 }
 
 
-/* =========================
-   LEADERBOARD MODAL
-========================= */
+/* =====================================================
+   OPEN LEADERBOARD
+===================================================== */
 
 function openLeaderboard() {
 
@@ -1167,6 +1453,10 @@ function openLeaderboard() {
 }
 
 
+/* =====================================================
+   CLOSE LEADERBOARD
+===================================================== */
+
 function closeLeaderboard() {
 
     document
@@ -1179,309 +1469,201 @@ function closeLeaderboard() {
 }
 
 
-/* =========================
-   PAUSE
-========================= */
-
-function togglePause() {
-
-    if (!running)
-        return;
-
-
-    paused = !paused;
-
-
-    document
-        .getElementById(
-            "pauseOverlay"
-        )
-        .classList.toggle(
-            "hidden",
-            !paused
-        );
-}
-
-
-/* =========================
-   COLOR SELECT
-========================= */
+/* =====================================================
+   COLOR SELECTION
+===================================================== */
 
 document
     .querySelectorAll(
         ".color-btn"
     )
-    .forEach(btn => {
+    .forEach(
+        button => {
 
-        btn.addEventListener(
-            "click",
-            () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                document
-                    .querySelectorAll(
-                        ".color-btn"
-                    )
-                    .forEach(
-                        b =>
-                            b.classList
-                                .remove(
-                                    "selected"
-                                )
+                    /*
+                       Remove old selection
+                    */
+
+                    document
+                        .querySelectorAll(
+                            ".color-btn"
+                        )
+                        .forEach(
+                            btn =>
+                                btn.classList
+                                    .remove(
+                                        "selected"
+                                    )
+                        );
+
+
+                    /*
+                       Select new color
+                    */
+
+                    button.classList.add(
+                        "selected"
                     );
 
 
-                btn.classList.add(
-                    "selected"
+                    snakeColor =
+                        button.dataset.color;
+
+                }
+            );
+
+        }
+    );
+
+
+/* =====================================================
+   START BUTTON
+===================================================== */
+
+document
+    .getElementById(
+        "startBtn"
+    )
+    .addEventListener(
+        "click",
+        startGame
+    );
+
+
+/* =====================================================
+   PLAY AGAIN
+===================================================== */
+
+document
+    .getElementById(
+        "playAgainBtn"
+    )
+    .addEventListener(
+        "click",
+        startGame
+    );
+
+
+/* =====================================================
+   HOME
+===================================================== */
+
+document
+    .getElementById(
+        "homeBtn"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            const audio =
+                document.getElementById(
+                    "deathAudio"
                 );
 
 
-                snakeColor =
-                    btn.dataset.color;
-
-            }
-        );
-
-    });
+            audio.pause();
 
 
-/* =========================
-   MAIN BUTTONS
-========================= */
-
-document
-    .getElementById("startBtn")
-    .onclick =
-    startGame;
+            audio.currentTime =
+                0;
 
 
-document
-    .getElementById("playAgainBtn")
-    .onclick =
-    startGame;
+            show(
+                "setupScreen"
+            );
+
+        }
+    );
 
 
-document
-    .getElementById("homeBtn")
-    .onclick =
-    () => {
-
-        document
-            .getElementById(
-                "deathAudio"
-            )
-            .pause();
-
-
-        show(
-            "setupScreen"
-        );
-
-    };
-
-
-document
-    .getElementById("quitBtn")
-    .onclick =
-    () => {
-
-        running = false;
-
-
-        document
-            .getElementById(
-                "deathAudio"
-            )
-            .pause();
-
-
-        show(
-            "setupScreen"
-        );
-
-    };
-
-
-document
-    .getElementById("pauseBtn")
-    .onclick =
-    togglePause;
-
-
-document
-    .getElementById("resumeBtn")
-    .onclick =
-    togglePause;
-
+/* =====================================================
+   LEADERBOARD BUTTON
+===================================================== */
 
 document
     .getElementById(
         "leaderboardBtn"
     )
-    .onclick =
-    openLeaderboard;
+    .addEventListener(
+        "click",
+        openLeaderboard
+    );
 
 
 document
     .getElementById(
         "gameOverLeaderboardBtn"
     )
-    .onclick =
-    openLeaderboard;
+    .addEventListener(
+        "click",
+        openLeaderboard
+    );
 
+
+/* =====================================================
+   CLOSE LEADERBOARD
+===================================================== */
 
 document
     .getElementById(
         "closeLeaderboard"
     )
-    .onclick =
-    closeLeaderboard;
+    .addEventListener(
+        "click",
+        closeLeaderboard
+    );
 
+
+/* =====================================================
+   CLEAR LEADERBOARD
+===================================================== */
 
 document
     .getElementById(
         "clearLeaderboard"
     )
-    .onclick =
-    () => {
+    .addEventListener(
+        "click",
+        () => {
 
-        if (
-            confirm(
-                "Clear all leaderboard scores?"
-            )
-        ) {
-
-            localStorage.removeItem(
-                "snakeLeaderboard"
-            );
-
-            renderLeaderboard();
-
-        }
-
-    };
+            const answer =
+                confirm(
+                    "Clear all leaderboard scores?"
+                );
 
 
-/* =========================
-   BUTTON CONTROLS
-========================= */
+            if (answer) {
 
-function bindButton(
-    id,
-    fn
-) {
+                localStorage.removeItem(
+                    "snakeLeaderboard"
+                );
 
-    document
-        .getElementById(id)
-        .addEventListener(
-            "pointerdown",
-            e => {
 
-                e.preventDefault();
-
-                fn();
+                renderLeaderboard();
 
             }
-        );
-
-}
-
-
-bindButton(
-    "upBtn",
-    () =>
-        setDirection(0, -1)
-);
-
-bindButton(
-    "downBtn",
-    () =>
-        setDirection(0, 1)
-);
-
-bindButton(
-    "leftBtn",
-    () =>
-        setDirection(-1, 0)
-);
-
-bindButton(
-    "rightBtn",
-    () =>
-        setDirection(1, 0)
-);
-
-
-/* =========================
-   KEYBOARD
-========================= */
-
-document.addEventListener(
-    "keydown",
-    e => {
-
-        if (
-            e.key === "ArrowUp" ||
-            e.key.toLowerCase() === "w"
-        ) {
-
-            setDirection(0, -1);
 
         }
+    );
 
 
-        if (
-            e.key === "ArrowDown" ||
-            e.key.toLowerCase() === "s"
-        ) {
-
-            setDirection(0, 1);
-
-        }
-
-
-        if (
-            e.key === "ArrowLeft" ||
-            e.key.toLowerCase() === "a"
-        ) {
-
-            setDirection(-1, 0);
-
-        }
-
-
-        if (
-            e.key === "ArrowRight" ||
-            e.key.toLowerCase() === "d"
-        ) {
-
-            setDirection(1, 0);
-
-        }
-
-
-        if (
-            e.key === " " &&
-            running
-        ) {
-
-            togglePause();
-
-        }
-
-    }
-);
-
-
-/* =========================
-   SWIPE CONTROL
-========================= */
+/* =====================================================
+   SWIPE START
+===================================================== */
 
 canvas.addEventListener(
+
     "touchstart",
-    e => {
+
+    function(event) {
 
         const touch =
-            e.changedTouches[0];
+            event.changedTouches[0];
 
 
         touchStartX =
@@ -1492,18 +1674,26 @@ canvas.addEventListener(
             touch.clientY;
 
     },
+
     {
         passive: true
     }
+
 );
 
 
+/* =====================================================
+   SWIPE END
+===================================================== */
+
 canvas.addEventListener(
+
     "touchend",
-    e => {
+
+    function(event) {
 
         const touch =
-            e.changedTouches[0];
+            event.changedTouches[0];
 
 
         const dx =
@@ -1517,14 +1707,16 @@ canvas.addEventListener(
 
 
         /*
-           Ignore very small movements.
+           Ignore tiny movements
         */
 
         if (
+
             Math.max(
                 Math.abs(dx),
                 Math.abs(dy)
             ) < 25
+
         ) {
 
             return;
@@ -1537,16 +1729,37 @@ canvas.addEventListener(
         */
 
         if (
+
             Math.abs(dx) >
             Math.abs(dy)
+
         ) {
 
-            setDirection(
-                dx > 0
-                    ? 1
-                    : -1,
-                0
-            );
+            if (dx > 0) {
+
+                /*
+                   Swipe RIGHT
+                */
+
+                setDirection(
+                    1,
+                    0
+                );
+
+            }
+
+            else {
+
+                /*
+                   Swipe LEFT
+                */
+
+                setDirection(
+                    -1,
+                    0
+                );
+
+            }
 
         }
 
@@ -1557,17 +1770,38 @@ canvas.addEventListener(
 
         else {
 
-            setDirection(
-                0,
-                dy > 0
-                    ? 1
-                    : -1
-            );
+            if (dy > 0) {
+
+                /*
+                   Swipe DOWN
+                */
+
+                setDirection(
+                    0,
+                    1
+                );
+
+            }
+
+            else {
+
+                /*
+                   Swipe UP
+                */
+
+                setDirection(
+                    0,
+                    -1
+                );
+
+            }
 
         }
 
     },
+
     {
         passive: true
     }
+
 );
