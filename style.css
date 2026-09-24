@@ -1,1807 +1,592 @@
-/* =====================================================
-   SNAKE GAME
-   Mobile Swipe Version
-===================================================== */
+* {
+    box-sizing: border-box;
 
-
-/* =====================================================
-   SETTINGS
-===================================================== */
-
-const GRID = 20;
-
-const BASE_SPEED = 130;
-
-const POWERUP_DURATION = 5000;
-
-
-/* =====================================================
-   CANVAS
-===================================================== */
-
-const canvas =
-    document.getElementById(
-        "gameCanvas"
-    );
-
-const ctx =
-    canvas.getContext("2d");
-
-
-/* =====================================================
-   SONG LIST
-===================================================== */
-
-const SONGS = [
-
-    {
-        title: "Dahil ikaw",
-        file: "dahil-ikaw.mp3"
-    },
-
-    {
-        title: "Buwan",
-        file: "buwan.mp3"
-    },
-
-    {
-        title: "Just the Way You Are",
-        file: "just-the-way-you-are.mp3"
-    },
-
-    {
-        title: "Beautiful",
-        file: "beautiful.mp3"
-    },
-
-    {
-        title: "Naiilang",
-        file: "naiilang.mp3"
-    },
-
-    {
-        title: "Maria Clara",
-        file: "maria-clara.mp3"
-    },
-
-    {
-        title: "Inaasam",
-        file: "inaasam.mp3"
-    },
-
-    {
-        title:
-            "Merry Christmas, I Miss You!",
-        file:
-            "merry-christmas-i-miss-you.mp3"
-    },
-
-    {
-        title:
-            "Merry Christmas, Please Don't Call!",
-        file:
-            "merry-christmas-please-dont-call.mp3"
-    },
-
-    {
-        title: "What If I Call",
-        file: "what-if-i-call.mp3"
-    },
-
-    {
-        title: "Perfect",
-        file: "perfect.mp3"
-    }
-
-];
-
-
-/* =====================================================
-   GAME VARIABLES
-===================================================== */
-
-let snakeName = "Player";
-
-let snakeColor = "#ff69b4";
-
-let snake = [];
-
-let food = null;
-
-let powerup = null;
-
-
-let direction = {
-    x: 1,
-    y: 0
-};
-
-
-let nextDirection = {
-    x: 1,
-    y: 0
-};
-
-
-let score = 0;
-
-let running = false;
-
-let lastMove = 0;
-
-let speed = BASE_SPEED;
-
-let powerupEnd = 0;
-
-
-let touchStartX = 0;
-
-let touchStartY = 0;
-
-
-let selectedSong = null;
-
-
-/* =====================================================
-   CANVAS RESIZE
-===================================================== */
-
-function resizeCanvas() {
-
-    const size =
-        Math.min(
-            window.innerWidth - 14,
-            600
-        );
-
-
-    const dpr =
-        window.devicePixelRatio || 1;
-
-
-    canvas.style.width =
-        size + "px";
-
-
-    canvas.style.height =
-        size + "px";
-
-
-    canvas.width =
-        Math.round(
-            size * dpr
-        );
-
-
-    canvas.height =
-        Math.round(
-            size * dpr
-        );
-
-
-    ctx.setTransform(
-
-        dpr * size / GRID,
-
-        0,
-
-        0,
-
-        dpr * size / GRID,
-
-        0,
-
-        0
-
-    );
-
+    -webkit-tap-highlight-color: transparent;
 }
 
 
-window.addEventListener(
-    "resize",
-    resizeCanvas
-);
+html,
+body {
 
+    margin: 0;
+    padding: 0;
 
-resizeCanvas();
+    width: 100%;
+    min-height: 100%;
 
+    background: #0b0b12;
 
-/* =====================================================
-   SHOW SCREEN
-===================================================== */
+    color: white;
 
-function show(id) {
+    font-family: Arial, Helvetica, sans-serif;
 
-    document
-        .querySelectorAll(".screen")
-        .forEach(screen => {
-
-            screen.classList.add(
-                "hidden"
-            );
-
-        });
-
-
-    document
-        .getElementById(id)
-        .classList.remove(
-            "hidden"
-        );
+    overflow-x: hidden;
 }
 
 
-/* =====================================================
-   START GAME
-===================================================== */
+body {
 
-function startGame() {
+    min-height: 100vh;
 
-    snakeName =
-        document
-            .getElementById(
-                "snakeName"
-            )
-            .value
-            .trim();
+    display: flex;
 
-
-    if (!snakeName) {
-
-        snakeName = "Player";
-
-    }
-
-
-    snakeName =
-        snakeName.substring(
-            0,
-            15
-        );
-
-
-    document
-        .getElementById(
-            "displayName"
-        )
-        .textContent =
-        snakeName;
-
-
-    /* Starting snake */
-
-    snake = [
-
-        {
-            x: 10,
-            y: 10
-        },
-
-        {
-            x: 9,
-            y: 10
-        },
-
-        {
-            x: 8,
-            y: 10
-        }
-
-    ];
-
-
-    direction = {
-
-        x: 1,
-        y: 0
-
-    };
-
-
-    nextDirection = {
-
-        x: 1,
-        y: 0
-
-    };
-
-
-    score = 0;
-
-
-    speed =
-        BASE_SPEED;
-
-
-    powerup = null;
-
-
-    powerupEnd = 0;
-
-
-    running = true;
-
-
-    document
-        .getElementById(
-            "score"
-        )
-        .textContent =
-        score;
-
-
-    document
-        .getElementById(
-            "powerupInfo"
-        )
-        .textContent =
-        "⚡ Power-up: none";
-
-
-    spawnFood();
-
-
-    spawnPowerupMaybe();
-
-
-    show(
-        "gameScreen"
-    );
-
-
-    resizeCanvas();
-
-
-    lastMove =
-        performance.now();
-
-
-    requestAnimationFrame(
-        gameLoop
-    );
+    justify-content: center;
 }
 
 
-/* =====================================================
-   SPAWN FOOD
-===================================================== */
+.app {
 
-function spawnFood() {
+    width: 100%;
 
-    do {
+    max-width: 600px;
 
-        food = {
+    min-height: 100vh;
 
-            x:
-                Math.floor(
-                    Math.random() *
-                    GRID
-                ),
-
-            y:
-                Math.floor(
-                    Math.random() *
-                    GRID
-                )
-
-        };
-
-    }
-
-    while (
-
-        snake.some(
-
-            part =>
-
-                part.x === food.x &&
-
-                part.y === food.y
-
-        )
-
-    );
+    padding: 10px;
 }
 
 
-/* =====================================================
-   SPAWN POWERUP
-===================================================== */
+/* =========================
+   SCREEN
+========================= */
 
-function spawnPowerupMaybe() {
+.screen {
 
-    /*
-       25% chance
-    */
+    width: 100%;
 
-    if (
-        Math.random() > 0.25
-    ) {
+    min-height:
+        calc(100vh - 20px);
 
-        powerup = null;
+    display: flex;
 
-        return;
+    flex-direction: column;
 
-    }
+    align-items: center;
 
-
-    let tries = 0;
-
-
-    do {
-
-        powerup = {
-
-            x:
-                Math.floor(
-                    Math.random() *
-                    GRID
-                ),
-
-            y:
-                Math.floor(
-                    Math.random() *
-                    GRID
-                ),
-
-            type: "slow"
-
-        };
-
-
-        tries++;
-
-
-    }
-
-    while (
-
-        tries < 100 &&
-
-        (
-
-            snake.some(
-
-                part =>
-
-                    part.x ===
-                    powerup.x &&
-
-                    part.y ===
-                    powerup.y
-
-            )
-
-            ||
-
-            (
-
-                food &&
-
-                food.x ===
-                powerup.x &&
-
-                food.y ===
-                powerup.y
-
-            )
-
-        )
-
-    );
+    justify-content: center;
 }
 
 
-/* =====================================================
-   CHANGE DIRECTION
-===================================================== */
-
-function setDirection(
-    x,
-    y
-) {
-
-    if (!running)
-        return;
-
-
-    /*
-       Prevent opposite direction.
-    */
-
-    if (
-
-        x === -direction.x &&
-
-        y === -direction.y
-
-    ) {
-
-        return;
-
-    }
-
-
-    if (
-
-        x === -nextDirection.x &&
-
-        y === -nextDirection.y
-
-    ) {
-
-        return;
-
-    }
-
-
-    nextDirection = {
-
-        x: x,
-
-        y: y
-
-    };
+.hidden {
+    display: none !important;
 }
 
 
-/* =====================================================
-   UPDATE GAME
-===================================================== */
+/* =========================
+   CARD
+========================= */
 
-function update() {
+.card {
 
-    direction =
-        nextDirection;
+    width: 100%;
 
+    max-width: 430px;
 
-    const head =
-        snake[0];
+    padding: 25px 18px;
 
+    border-radius: 22px;
 
-    const newHead = {
+    background: #171722;
 
-        x:
-            head.x +
-            direction.x,
+    border: 1px solid #29293a;
 
-        y:
-            head.y +
-            direction.y
+    text-align: center;
 
-    };
-
-
-    /* =================================
-       WALL COLLISION
-    ================================= */
-
-    if (
-
-        newHead.x < 0 ||
-
-        newHead.x >= GRID ||
-
-        newHead.y < 0 ||
-
-        newHead.y >= GRID
-
-    ) {
-
-        gameOver();
-
-        return;
-
-    }
-
-
-    /* =================================
-       SELF COLLISION
-    ================================= */
-
-    if (
-
-        snake.some(
-
-            part =>
-
-                part.x ===
-                newHead.x &&
-
-                part.y ===
-                newHead.y
-
-        )
-
-    ) {
-
-        gameOver();
-
-        return;
-
-    }
-
-
-    /*
-       Add new head
-    */
-
-    snake.unshift(
-        newHead
-    );
-
-
-    /* =================================
-       FOOD
-    ================================= */
-
-    if (
-
-        food &&
-
-        newHead.x === food.x &&
-
-        newHead.y === food.y
-
-    ) {
-
-        /*
-           EXACTLY ONE POINT
-           PER FOOD
-        */
-
-        score += 1;
-
-
-        document
-            .getElementById(
-                "score"
-            )
-            .textContent =
-            score;
-
-
-        spawnFood();
-
-
-        spawnPowerupMaybe();
-
-    }
-
-    else {
-
-        snake.pop();
-
-    }
-
-
-    /* =================================
-       POWERUP
-    ================================= */
-
-    if (
-
-        powerup &&
-
-        newHead.x ===
-        powerup.x &&
-
-        newHead.y ===
-        powerup.y
-
-    ) {
-
-        /*
-           Slow snake
-        */
-
-        speed =
-            BASE_SPEED * 1.65;
-
-
-        powerupEnd =
-            performance.now() +
-            POWERUP_DURATION;
-
-
-        document
-            .getElementById(
-                "powerupInfo"
-            )
-            .textContent =
-            "🐌 Slow power-up active!";
-
-
-        powerup = null;
-
-    }
-
+    box-shadow:
+        0 15px 45px rgba(0,0,0,.35);
 }
 
 
-/* =====================================================
-   GAME LOOP
-===================================================== */
+h1 {
 
-function gameLoop(now) {
+    margin: 0 0 8px;
 
-    if (!running)
-        return;
-
-
-    /*
-       Check power-up timer
-    */
-
-    if (
-
-        powerupEnd &&
-
-        now >= powerupEnd
-
-    ) {
-
-        speed =
-            BASE_SPEED;
-
-
-        powerupEnd = 0;
-
-
-        document
-            .getElementById(
-                "powerupInfo"
-            )
-            .textContent =
-            "⚡ Power-up: none";
-
-    }
-
-
-    /*
-       Move snake
-    */
-
-    if (
-
-        now - lastMove >= speed
-
-    ) {
-
-        update();
-
-
-        lastMove =
-            now;
-
-    }
-
-
-    /*
-       Draw
-    */
-
-    draw();
-
-
-    requestAnimationFrame(
-        gameLoop
-    );
+    font-size:
+        clamp(28px, 8vw, 42px);
 }
 
 
-/* =====================================================
-   DRAW GAME
-===================================================== */
+.subtitle {
 
-function draw() {
+    color: #aaaabd;
 
-    /*
-       Background
-    */
-
-    ctx.clearRect(
-        0,
-        0,
-        GRID,
-        GRID
-    );
-
-
-    ctx.fillStyle =
-        "#050509";
-
-
-    ctx.fillRect(
-        0,
-        0,
-        GRID,
-        GRID
-    );
-
-
-    /*
-       Grid
-    */
-
-    ctx.strokeStyle =
-        "rgba(255,255,255,.035)";
-
-
-    ctx.lineWidth =
-        0.03;
-
-
-    for (
-        let i = 0;
-        i <= GRID;
-        i++
-    ) {
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            i,
-            0
-        );
-
-        ctx.lineTo(
-            i,
-            GRID
-        );
-
-        ctx.stroke();
-
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            0,
-            i
-        );
-
-        ctx.lineTo(
-            GRID,
-            i
-        );
-
-        ctx.stroke();
-
-    }
-
-
-    /* =================================
-       FOOD
-    ================================= */
-
-    if (food) {
-
-        ctx.fillStyle =
-            "#e74c3c";
-
-
-        ctx.beginPath();
-
-
-        ctx.arc(
-
-            food.x + 0.5,
-
-            food.y + 0.5,
-
-            0.34,
-
-            0,
-
-            Math.PI * 2
-
-        );
-
-
-        ctx.fill();
-
-    }
-
-
-    /* =================================
-       POWERUP
-    ================================= */
-
-    if (powerup) {
-
-        ctx.fillStyle =
-            "#4dd0e1";
-
-
-        ctx.beginPath();
-
-
-        ctx.arc(
-
-            powerup.x + 0.5,
-
-            powerup.y + 0.5,
-
-            0.30,
-
-            0,
-
-            Math.PI * 2
-
-        );
-
-
-        ctx.fill();
-
-
-        ctx.fillStyle =
-            "#06151a";
-
-
-        ctx.font =
-            "0.45px Arial";
-
-
-        ctx.textAlign =
-            "center";
-
-
-        ctx.textBaseline =
-            "middle";
-
-
-        ctx.fillText(
-
-            "S",
-
-            powerup.x + 0.5,
-
-            powerup.y + 0.5
-
-        );
-
-    }
-
-
-    /* =================================
-       SNAKE
-    ================================= */
-
-    snake.forEach(
-        (part, index) => {
-
-            ctx.fillStyle =
-                snakeColor;
-
-
-            const pad =
-                index === 0
-                    ? 0.04
-                    : 0.09;
-
-
-            roundRect(
-
-                part.x + pad,
-
-                part.y + pad,
-
-                1 - pad * 2,
-
-                1 - pad * 2,
-
-                0.18
-
-            );
-
-
-            ctx.fill();
-
-
-            /*
-               Snake eyes
-            */
-
-            if (index === 0) {
-
-                drawSnakeEyes(
-                    part
-                );
-
-            }
-
-        }
-    );
+    margin-bottom: 25px;
 }
 
 
-/* =====================================================
-   SNAKE EYES
-===================================================== */
+/* =========================
+   INPUT
+========================= */
 
-function drawSnakeEyes(part) {
+label {
 
-    ctx.fillStyle =
-        "#ffffff";
+    display: block;
 
+    text-align: left;
 
-    let eyeX1;
+    margin:
+        15px 0 7px;
 
-    let eyeX2;
+    color: #ddd;
 
-    let eyeY;
-
-
-    if (direction.x !== 0) {
-
-        eyeX1 =
-            part.x +
-            (
-                direction.x > 0
-                    ? 0.70
-                    : 0.30
-            );
-
-
-        eyeX2 =
-            eyeX1;
-
-
-        eyeY =
-            part.y + 0.35;
-
-    }
-
-    else {
-
-        eyeY =
-            part.y +
-            (
-                direction.y > 0
-                    ? 0.70
-                    : 0.30
-            );
-
-
-        eyeX1 =
-            part.x + 0.35;
-
-
-        eyeX2 =
-            part.x + 0.65;
-
-    }
-
-
-    ctx.beginPath();
-
-
-    ctx.arc(
-
-        eyeX1,
-
-        eyeY,
-
-        0.09,
-
-        0,
-
-        Math.PI * 2
-
-    );
-
-
-    ctx.fill();
-
-
-    ctx.beginPath();
-
-
-    ctx.arc(
-
-        eyeX2,
-
-        eyeY,
-
-        0.09,
-
-        0,
-
-        Math.PI * 2
-
-    );
-
-
-    ctx.fill();
+    font-weight: bold;
 }
 
 
-/* =====================================================
-   ROUNDED RECTANGLE
-===================================================== */
+input {
 
-function roundRect(
-    x,
-    y,
-    w,
-    h,
-    r
-) {
+    width: 100%;
 
-    ctx.beginPath();
+    padding: 13px 15px;
 
+    border-radius: 12px;
 
-    ctx.moveTo(
-        x + r,
-        y
-    );
+    border:
+        1px solid #3a3a4d;
 
+    background: #0f0f18;
 
-    ctx.arcTo(
-        x + w,
-        y,
-        x + w,
-        y + h,
-        r
-    );
+    color: white;
 
+    outline: none;
 
-    ctx.arcTo(
-        x + w,
-        y + h,
-        x,
-        y + h,
-        r
-    );
-
-
-    ctx.arcTo(
-        x,
-        y + h,
-        x,
-        y,
-        r
-    );
-
-
-    ctx.arcTo(
-        x,
-        y,
-        x + w,
-        y,
-        r
-    );
-
-
-    ctx.closePath();
+    font-size: 16px;
 }
 
 
-/* =====================================================
+/* =========================
+   COLOR BUTTONS
+========================= */
+
+.colors {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+    margin:
+        10px 0 24px;
+}
+
+
+.color-btn {
+
+    width: 38px;
+
+    height: 38px;
+
+    padding: 0;
+
+    border-radius: 50%;
+
+    border:
+        3px solid transparent;
+
+    background: var(--c);
+
+    box-shadow:
+        inset 0 0 0 2px
+        rgba(255,255,255,.15);
+}
+
+
+.color-btn.selected {
+
+    border-color: white;
+
+    transform: scale(1.12);
+}
+
+
+/* =========================
+   GENERAL BUTTONS
+========================= */
+
+.primary,
+.secondary,
+.danger {
+
+    width: 100%;
+
+    border: 0;
+
+    border-radius: 12px;
+
+    padding: 13px 16px;
+
+    margin-top: 10px;
+
+    font-weight: bold;
+
+    font-size: 15px;
+}
+
+
+.primary {
+
+    background: white;
+
+    color: #111;
+}
+
+
+.secondary {
+
+    background: #29293a;
+
+    color: white;
+}
+
+
+.danger {
+
+    background: #8f2731;
+
+    color: white;
+}
+
+
+.tip {
+
+    color: #85859a;
+
+    font-size: 13px;
+
+    margin-top: 18px;
+}
+
+
+/* =========================
+   GAME HEADER
+========================= */
+
+.game-header {
+
+    width: 100%;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding:
+        5px 3px 10px;
+
+    font-size: 15px;
+
+    font-weight: bold;
+}
+
+
+/* =========================
+   GAME BOARD
+========================= */
+
+#gameWrap {
+
+    width: 100%;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    touch-action: none;
+}
+
+
+canvas {
+
+    display: block;
+
+    width: 100%;
+
+    max-width: 600px;
+
+    height: auto;
+
+    aspect-ratio: 1 / 1;
+
+    background: #050509;
+
+    border:
+        2px solid #2b2b3b;
+
+    border-radius: 14px;
+
+    touch-action: none;
+}
+
+
+/* =========================
+   POWER UP
+========================= */
+
+#powerupInfo {
+
+    margin-top: 10px;
+
+    text-align: center;
+
+    color: #aaaabd;
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   SWIPE TEXT
+========================= */
+
+.swipe-hint {
+
+    margin: 7px 0 0;
+
+    color: #666679;
+
+    font-size: 12px;
+
+    text-align: center;
+}
+
+
+/* =========================
    GAME OVER
-===================================================== */
+========================= */
 
-function gameOver() {
+.big-score {
 
-    running = false;
+    font-size: 70px;
 
+    font-weight: 900;
 
-    /*
-       Save score
-    */
-
-    saveScore();
-
-
-    /*
-       Choose random song
-    */
-
-    selectedSong =
-        SONGS[
-            Math.floor(
-                Math.random() *
-                SONGS.length
-            )
-        ];
-
-
-    /*
-       Display score
-    */
-
-    document
-        .getElementById(
-            "finalScore"
-        )
-        .textContent =
-        score;
-
-
-    document
-        .getElementById(
-            "finalMessage"
-        )
-        .textContent =
-
-        `${snakeName} scored ${
-            score
-        } point${
-            score === 1
-                ? ""
-                : "s"
-        }.`;
-
-
-
-    /*
-       Display ONLY
-       song title.
-       
-       NO LYRICS.
-    */
-
-    document
-        .getElementById(
-            "songTitle"
-        )
-        .textContent =
-        selectedSong.title;
-
-
-    /*
-       Load MP3
-    */
-
-    const audio =
-        document.getElementById(
-            "deathAudio"
-        );
-
-
-    audio.src =
-        "assets/" +
-        selectedSong.file;
-
-
-    audio.currentTime =
-        0;
-
-
-    /*
-       Show game over
-    */
-
-    show(
-        "gameOverScreen"
-    );
-
-
-    /*
-       Try automatic playback
-    */
-
-    audio
-        .play()
-        .catch(
-            () => {
-
-                /*
-                   Mobile browsers may
-                   block automatic audio.
-                */
-
-            }
-        );
+    margin:
+        10px 0;
 }
 
 
-/* =====================================================
+.song-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    text-align: left;
+
+    background: #0e0e17;
+
+    border:
+        1px solid #2d2d40;
+
+    padding: 12px;
+
+    border-radius: 15px;
+
+    margin:
+        20px 0 12px;
+}
+
+
+.song-picture {
+
+    width: 65px;
+
+    height: 65px;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    display: grid;
+
+    place-items: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #29293a,
+            #11111a
+        );
+
+    font-size: 30px;
+}
+
+
+.song-label {
+
+    color: #88889b;
+
+    font-size: 12px;
+}
+
+
+.song-title {
+
+    font-weight: 800;
+
+    margin-top: 4px;
+}
+
+
+audio {
+
+    width: 100%;
+
+    margin-bottom: 5px;
+}
+
+
+/* =========================
    LEADERBOARD
-===================================================== */
+========================= */
 
-function saveScore() {
+.modal {
 
-    const board =
-        JSON.parse(
+    position: fixed;
 
-            localStorage.getItem(
-                "snakeLeaderboard"
-            ) || "[]"
+    inset: 0;
 
-        );
+    display: grid;
 
+    place-items: center;
 
-    board.push({
+    background:
+        rgba(0,0,0,.75);
 
-        name:
-            snakeName,
+    padding: 18px;
 
-        score:
-            score,
-
-        date:
-            new Date()
-                .toLocaleDateString()
-
-    });
-
-
-    /*
-       Highest scores first
-    */
-
-    board.sort(
-
-        (a, b) =>
-            b.score -
-            a.score
-
-    );
-
-
-    /*
-       Keep top 10
-    */
-
-    localStorage.setItem(
-
-        "snakeLeaderboard",
-
-        JSON.stringify(
-            board.slice(0, 10)
-        )
-
-    );
+    z-index: 10;
 }
 
 
-/* =====================================================
-   DISPLAY LEADERBOARD
-===================================================== */
+.modal-card {
 
-function renderLeaderboard() {
+    width:
+        min(440px, 100%);
 
-    const board =
-        JSON.parse(
+    max-height: 85vh;
 
-            localStorage.getItem(
-                "snakeLeaderboard"
-            ) || "[]"
+    overflow: auto;
 
-        );
+    background: #171722;
 
+    border:
+        1px solid #303044;
 
-    const list =
-        document.getElementById(
-            "leaderboardList"
-        );
+    border-radius: 20px;
 
+    padding: 25px;
 
-    list.innerHTML = "";
+    position: relative;
+}
 
 
-    if (
-        board.length === 0
-    ) {
+.close {
 
-        const li =
-            document.createElement(
-                "li"
-            );
+    position: absolute;
+
+    right: 15px;
+
+    top: 10px;
+
+    border: 0;
+
+    background: none;
+
+    color: white;
+
+    font-size: 30px;
+}
 
 
-        li.textContent =
-            "No scores yet.";
+#leaderboardList {
+
+    padding-left: 25px;
+}
 
 
-        list.appendChild(
-            li
-        );
+#leaderboardList li {
+
+    padding: 9px 4px;
+
+    border-bottom:
+        1px solid #29293a;
+}
 
 
-        return;
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 430px) {
+
+    .app {
+
+        padding: 7px;
     }
 
 
-    board.forEach(
-        item => {
+    .screen {
 
-            const li =
-                document.createElement(
-                    "li"
-                );
-
-
-            li.textContent =
-
-                `${item.name} — ${
-                    item.score
-                } point${
-                    item.score === 1
-                        ? ""
-                        : "s"
-                } (${item.date})`;
-
-
-            list.appendChild(
-                li
-            );
-
-        }
-    );
-}
-
-
-/* =====================================================
-   OPEN LEADERBOARD
-===================================================== */
-
-function openLeaderboard() {
-
-    renderLeaderboard();
-
-
-    document
-        .getElementById(
-            "leaderboardModal"
-        )
-        .classList.remove(
-            "hidden"
-        );
-}
-
-
-/* =====================================================
-   CLOSE LEADERBOARD
-===================================================== */
-
-function closeLeaderboard() {
-
-    document
-        .getElementById(
-            "leaderboardModal"
-        )
-        .classList.add(
-            "hidden"
-        );
-}
-
-
-/* =====================================================
-   COLOR SELECTION
-===================================================== */
-
-document
-    .querySelectorAll(
-        ".color-btn"
-    )
-    .forEach(
-        button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    /*
-                       Remove old selection
-                    */
-
-                    document
-                        .querySelectorAll(
-                            ".color-btn"
-                        )
-                        .forEach(
-                            btn =>
-                                btn.classList
-                                    .remove(
-                                        "selected"
-                                    )
-                        );
-
-
-                    /*
-                       Select new color
-                    */
-
-                    button.classList.add(
-                        "selected"
-                    );
-
-
-                    snakeColor =
-                        button.dataset.color;
-
-                }
-            );
-
-        }
-    );
-
-
-/* =====================================================
-   START BUTTON
-===================================================== */
-
-document
-    .getElementById(
-        "startBtn"
-    )
-    .addEventListener(
-        "click",
-        startGame
-    );
-
-
-/* =====================================================
-   PLAY AGAIN
-===================================================== */
-
-document
-    .getElementById(
-        "playAgainBtn"
-    )
-    .addEventListener(
-        "click",
-        startGame
-    );
-
-
-/* =====================================================
-   HOME
-===================================================== */
-
-document
-    .getElementById(
-        "homeBtn"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            const audio =
-                document.getElementById(
-                    "deathAudio"
-                );
-
-
-            audio.pause();
-
-
-            audio.currentTime =
-                0;
-
-
-            show(
-                "setupScreen"
-            );
-
-        }
-    );
-
-
-/* =====================================================
-   LEADERBOARD BUTTON
-===================================================== */
-
-document
-    .getElementById(
-        "leaderboardBtn"
-    )
-    .addEventListener(
-        "click",
-        openLeaderboard
-    );
-
-
-document
-    .getElementById(
-        "gameOverLeaderboardBtn"
-    )
-    .addEventListener(
-        "click",
-        openLeaderboard
-    );
-
-
-/* =====================================================
-   CLOSE LEADERBOARD
-===================================================== */
-
-document
-    .getElementById(
-        "closeLeaderboard"
-    )
-    .addEventListener(
-        "click",
-        closeLeaderboard
-    );
-
-
-/* =====================================================
-   CLEAR LEADERBOARD
-===================================================== */
-
-document
-    .getElementById(
-        "clearLeaderboard"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            const answer =
-                confirm(
-                    "Clear all leaderboard scores?"
-                );
-
-
-            if (answer) {
-
-                localStorage.removeItem(
-                    "snakeLeaderboard"
-                );
-
-
-                renderLeaderboard();
-
-            }
-
-        }
-    );
-
-
-/* =====================================================
-   SWIPE START
-===================================================== */
-
-canvas.addEventListener(
-
-    "touchstart",
-
-    function(event) {
-
-        const touch =
-            event.changedTouches[0];
-
-
-        touchStartX =
-            touch.clientX;
-
-
-        touchStartY =
-            touch.clientY;
-
-    },
-
-    {
-        passive: true
+        min-height:
+            calc(100vh - 14px);
     }
 
-);
 
+    .game-header {
 
-/* =====================================================
-   SWIPE END
-===================================================== */
+        padding:
+            5px 2px 8px;
 
-canvas.addEventListener(
-
-    "touchend",
-
-    function(event) {
-
-        const touch =
-            event.changedTouches[0];
-
-
-        const dx =
-            touch.clientX -
-            touchStartX;
-
-
-        const dy =
-            touch.clientY -
-            touchStartY;
-
-
-        /*
-           Ignore tiny movements
-        */
-
-        if (
-
-            Math.max(
-                Math.abs(dx),
-                Math.abs(dy)
-            ) < 25
-
-        ) {
-
-            return;
-
-        }
-
-
-        /*
-           Horizontal swipe
-        */
-
-        if (
-
-            Math.abs(dx) >
-            Math.abs(dy)
-
-        ) {
-
-            if (dx > 0) {
-
-                /*
-                   Swipe RIGHT
-                */
-
-                setDirection(
-                    1,
-                    0
-                );
-
-            }
-
-            else {
-
-                /*
-                   Swipe LEFT
-                */
-
-                setDirection(
-                    -1,
-                    0
-                );
-
-            }
-
-        }
-
-
-        /*
-           Vertical swipe
-        */
-
-        else {
-
-            if (dy > 0) {
-
-                /*
-                   Swipe DOWN
-                */
-
-                setDirection(
-                    0,
-                    1
-                );
-
-            }
-
-            else {
-
-                /*
-                   Swipe UP
-                */
-
-                setDirection(
-                    0,
-                    -1
-                );
-
-            }
-
-        }
-
-    },
-
-    {
-        passive: true
+        font-size: 14px;
     }
 
-);
+
+    canvas {
+
+        width: 100%;
+
+        max-width: 100%;
+
+        border-radius: 12px;
+    }
+
+
+    .swipe-hint {
+
+        margin-top: 6px;
+    }
+}
+
+
+/* =========================
+   SMALL PHONES
+========================= */
+
+@media (max-width: 360px) {
+
+    .app {
+
+        padding: 5px;
+    }
+
+
+    .game-header {
+
+        font-size: 13px;
+    }
+
+
+    canvas {
+
+        border-radius: 10px;
+    }
+}
