@@ -1,111 +1,165 @@
 * {
     box-sizing: border-box;
+
     -webkit-tap-highlight-color: transparent;
 }
 
+
 html,
 body {
-    margin: 0;
-    min-height: 100%;
-    background: #0b0b12;
-    color: white;
-    font-family: Arial, sans-serif;
-}
 
-body {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
+    margin: 0;
+    padding: 0;
+
+    width: 100%;
+    min-height: 100%;
+
+    background: #0b0b12;
+
+    color: white;
+
+    font-family: Arial, Helvetica, sans-serif;
+
     overflow-x: hidden;
 }
 
-.app {
-    width: 100%;
-    max-width: 680px;
-    min-height: 100vh;
-    padding: 16px;
-}
 
-.screen {
-    min-height: calc(100vh - 32px);
+body {
+
+    min-height: 100vh;
 
     display: flex;
-    align-items: center;
+
     justify-content: center;
 }
+
+
+.app {
+
+    width: 100%;
+
+    max-width: 600px;
+
+    min-height: 100vh;
+
+    padding: 10px;
+}
+
+
+/* =========================
+   SCREEN
+========================= */
+
+.screen {
+
+    width: 100%;
+
+    min-height:
+        calc(100vh - 20px);
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
 
 .hidden {
     display: none !important;
 }
 
 
-/* CARD */
+/* =========================
+   CARD
+========================= */
 
 .card {
+
     width: 100%;
-    max-width: 460px;
 
-    padding: 28px;
+    max-width: 430px;
 
-    border-radius: 24px;
+    padding: 25px 18px;
+
+    border-radius: 22px;
 
     background: #171722;
 
     border: 1px solid #29293a;
 
+    text-align: center;
+
     box-shadow:
         0 15px 45px rgba(0,0,0,.35);
-
-    text-align: center;
 }
 
+
 h1 {
+
     margin: 0 0 8px;
 
     font-size:
         clamp(28px, 8vw, 42px);
 }
 
+
 .subtitle {
+
     color: #aaaabd;
+
     margin-bottom: 25px;
 }
 
 
-/* INPUT */
+/* =========================
+   INPUT
+========================= */
 
 label {
+
     display: block;
 
     text-align: left;
 
-    margin: 15px 0 7px;
+    margin:
+        15px 0 7px;
 
     color: #ddd;
 
     font-weight: bold;
 }
 
+
 input {
+
     width: 100%;
 
     padding: 13px 15px;
 
     border-radius: 12px;
 
-    border: 1px solid #3a3a4d;
+    border:
+        1px solid #3a3a4d;
 
     background: #0f0f18;
 
     color: white;
 
     outline: none;
+
+    font-size: 16px;
 }
 
 
-/* COLORS */
+/* =========================
+   COLOR BUTTONS
+========================= */
 
 .colors {
+
     display: flex;
 
     justify-content: center;
@@ -114,35 +168,48 @@ input {
 
     flex-wrap: wrap;
 
-    margin: 10px 0 24px;
+    margin:
+        10px 0 24px;
 }
 
+
 .color-btn {
-    width: 39px;
-    height: 39px;
+
+    width: 38px;
+
+    height: 38px;
+
+    padding: 0;
 
     border-radius: 50%;
 
-    border: 3px solid transparent;
+    border:
+        3px solid transparent;
 
     background: var(--c);
 
     box-shadow:
-        inset 0 0 0 2px rgba(255,255,255,.15);
+        inset 0 0 0 2px
+        rgba(255,255,255,.15);
 }
 
+
 .color-btn.selected {
+
     border-color: white;
 
     transform: scale(1.12);
 }
 
 
-/* BUTTONS */
+/* =========================
+   GENERAL BUTTONS
+========================= */
 
 .primary,
 .secondary,
 .danger {
+
     width: 100%;
 
     border: 0;
@@ -154,27 +221,37 @@ input {
     margin-top: 10px;
 
     font-weight: bold;
+
+    font-size: 15px;
 }
 
+
 .primary {
+
     background: white;
 
     color: #111;
 }
 
+
 .secondary {
+
     background: #29293a;
 
     color: white;
 }
 
+
 .danger {
+
     background: #8f2731;
 
     color: white;
 }
 
+
 .tip {
+
     color: #85859a;
 
     font-size: 13px;
@@ -183,138 +260,119 @@ input {
 }
 
 
-/* GAME */
+/* =========================
+   GAME HEADER
+========================= */
 
 .game-header {
+
+    width: 100%;
+
     display: flex;
 
     justify-content: space-between;
 
     align-items: center;
 
-    padding: 4px 2px 10px;
+    padding:
+        5px 3px 10px;
+
+    font-size: 15px;
 
     font-weight: bold;
 }
 
+
+/* =========================
+   GAME BOARD
+========================= */
+
 #gameWrap {
-    position: relative;
-
-    width: min(92vw, 600px);
-
-    margin: auto;
-}
-
-canvas {
-    display: block;
 
     width: 100%;
 
-    aspect-ratio: 1 / 1;
+    display: flex;
 
-    background: #050509;
+    justify-content: center;
 
-    border: 2px solid #2b2b3b;
-
-    border-radius: 12px;
+    align-items: center;
 
     touch-action: none;
 }
 
 
-/* PAUSE */
+canvas {
 
-.overlay {
-    position: absolute;
+    display: block;
 
-    inset: 0;
+    width: 100%;
 
-    display: grid;
+    max-width: 600px;
 
-    place-items: center;
+    height: auto;
 
-    background: rgba(0,0,0,.7);
+    aspect-ratio: 1 / 1;
 
-    border-radius: 12px;
-}
+    background: #050509;
 
-.overlay-box {
-    background: #171722;
+    border:
+        2px solid #2b2b3b;
 
-    padding: 25px;
+    border-radius: 14px;
 
-    border-radius: 18px;
-
-    text-align: center;
-
-    width: 80%;
+    touch-action: none;
 }
 
 
-/* CONTROLS */
-
-.controls {
-    text-align: center;
-
-    margin: 12px auto 4px;
-
-    touch-action: manipulation;
-}
-
-.controls button {
-    width: 54px;
-
-    height: 45px;
-
-    margin: 3px;
-
-    border: 0;
-
-    border-radius: 11px;
-
-    background: #242435;
-
-    color: white;
-
-    font-size: 20px;
-}
-
-.controls button:active {
-    transform: scale(.94);
-}
-
-.game-buttons {
-    display: flex;
-
-    gap: 8px;
-}
-
-.game-buttons button {
-    flex: 1;
-}
+/* =========================
+   POWER UP
+========================= */
 
 #powerupInfo {
+
+    margin-top: 10px;
+
     text-align: center;
 
-    color: #a9a9bb;
+    color: #aaaabd;
 
     font-size: 13px;
-
-    margin-top: 9px;
 }
 
 
-/* GAME OVER */
+/* =========================
+   SWIPE TEXT
+========================= */
+
+.swipe-hint {
+
+    margin: 7px 0 0;
+
+    color: #666679;
+
+    font-size: 12px;
+
+    text-align: center;
+}
+
+
+/* =========================
+   GAME OVER
+========================= */
 
 .big-score {
+
     font-size: 70px;
 
     font-weight: 900;
 
-    margin: 10px 0;
+    margin:
+        10px 0;
 }
 
+
 .song-card {
+
     display: flex;
 
     align-items: center;
@@ -325,18 +383,25 @@ canvas {
 
     background: #0e0e17;
 
-    border: 1px solid #2d2d40;
+    border:
+        1px solid #2d2d40;
 
     padding: 12px;
 
     border-radius: 15px;
 
-    margin: 20px 0 12px;
+    margin:
+        20px 0 12px;
 }
 
+
 .song-picture {
+
     width: 65px;
+
     height: 65px;
+
+    flex-shrink: 0;
 
     border-radius: 10px;
 
@@ -354,28 +419,37 @@ canvas {
     font-size: 30px;
 }
 
+
 .song-label {
+
     color: #88889b;
 
     font-size: 12px;
 }
 
+
 .song-title {
+
     font-weight: 800;
 
     margin-top: 4px;
 }
 
+
 audio {
+
     width: 100%;
 
     margin-bottom: 5px;
 }
 
 
-/* LEADERBOARD */
+/* =========================
+   LEADERBOARD
+========================= */
 
 .modal {
+
     position: fixed;
 
     inset: 0;
@@ -384,15 +458,19 @@ audio {
 
     place-items: center;
 
-    background: rgba(0,0,0,.75);
+    background:
+        rgba(0,0,0,.75);
 
     padding: 18px;
 
     z-index: 10;
 }
 
+
 .modal-card {
-    width: min(440px, 100%);
+
+    width:
+        min(440px, 100%);
 
     max-height: 85vh;
 
@@ -400,7 +478,8 @@ audio {
 
     background: #171722;
 
-    border: 1px solid #303044;
+    border:
+        1px solid #303044;
 
     border-radius: 20px;
 
@@ -409,7 +488,9 @@ audio {
     position: relative;
 }
 
+
 .close {
+
     position: absolute;
 
     right: 15px;
@@ -425,11 +506,15 @@ audio {
     font-size: 30px;
 }
 
+
 #leaderboardList {
+
     padding-left: 25px;
 }
 
+
 #leaderboardList li {
+
     padding: 9px 4px;
 
     border-bottom:
@@ -437,25 +522,71 @@ audio {
 }
 
 
-/* MOBILE */
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 430px) {
 
     .app {
-        padding: 10px;
+
+        padding: 7px;
     }
+
 
     .screen {
+
         min-height:
-            calc(100vh - 20px);
+            calc(100vh - 14px);
     }
 
-    .card {
-        padding: 22px 17px;
+
+    .game-header {
+
+        padding:
+            5px 2px 8px;
+
+        font-size: 14px;
     }
 
-    .controls button {
-        width: 50px;
-        height: 43px;
+
+    canvas {
+
+        width: 100%;
+
+        max-width: 100%;
+
+        border-radius: 12px;
+    }
+
+
+    .swipe-hint {
+
+        margin-top: 6px;
+    }
+}
+
+
+/* =========================
+   SMALL PHONES
+========================= */
+
+@media (max-width: 360px) {
+
+    .app {
+
+        padding: 5px;
+    }
+
+
+    .game-header {
+
+        font-size: 13px;
+    }
+
+
+    canvas {
+
+        border-radius: 10px;
     }
 }
