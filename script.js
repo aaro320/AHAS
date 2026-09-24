@@ -1,6 +1,6 @@
 /* =====================================================
    SNAKE GAME
-   Mobile Swipe Version
+   Mobile Swipe + Desktop Keyboard (Arrow & WASD) Version
 ===================================================== */
 
 
@@ -10,7 +10,7 @@
 
 const GRID = 20;
 
-/* Base speed lowered to 200ms per move for easier control */
+/* Base speed set to 200ms per move for easier initial control */
 const BASE_SPEED = 200;
 
 const POWERUP_DURATION = 5000;
@@ -524,10 +524,7 @@ function spawnBigFoodMaybe() {
 
 function spawnPowerupMaybe() {
 
-    /*
-       25% chance
-    */
-
+    /* 25% chance */
     if (
         Math.random() > 0.25
     ) {
@@ -631,10 +628,7 @@ function setDirection(
         return;
 
 
-    /*
-       Prevent opposite direction.
-    */
-
+    /* Prevent opposite direction */
     if (
 
         x === -direction.x &&
@@ -698,10 +692,7 @@ function update() {
     };
 
 
-    /* =================================
-       WALL COLLISION
-    ================================= */
-
+    /* Wall collision */
     if (
 
         newHead.x < 0 ||
@@ -721,10 +712,7 @@ function update() {
     }
 
 
-    /* =================================
-       SELF COLLISION
-    ================================= */
-
+    /* Self collision */
     if (
 
         snake.some(
@@ -748,10 +736,6 @@ function update() {
     }
 
 
-    /*
-       Add new head
-    */
-
     snake.unshift(
         newHead
     );
@@ -760,10 +744,7 @@ function update() {
     let ateFood = false;
 
 
-    /* =================================
-       REGULAR FOOD
-    ================================= */
-
+    /* Regular food */
     if (
 
         food &&
@@ -799,10 +780,7 @@ function update() {
     }
 
 
-    /* =================================
-       BIG FOOD
-    ================================= */
-
+    /* Big food */
     else if (
 
         bigFood &&
@@ -839,10 +817,7 @@ function update() {
     }
 
 
-    /* =================================
-       POWERUP
-    ================================= */
-
+    /* Power-up */
     if (
 
         powerup &&
@@ -854,10 +829,6 @@ function update() {
         powerup.y
 
     ) {
-
-        /*
-           Slow snake
-        */
 
         speed =
             BASE_SPEED * 1.65;
@@ -893,10 +864,6 @@ function gameLoop(now) {
         return;
 
 
-    /*
-       Check power-up timer
-    */
-
     if (
 
         powerupEnd &&
@@ -922,10 +889,6 @@ function gameLoop(now) {
     }
 
 
-    /*
-       Move snake
-    */
-
     if (
 
         now - lastMove >= speed
@@ -941,10 +904,6 @@ function gameLoop(now) {
     }
 
 
-    /*
-       Draw
-    */
-
     draw();
 
 
@@ -959,10 +918,6 @@ function gameLoop(now) {
 ===================================================== */
 
 function draw() {
-
-    /*
-       Background
-    */
 
     ctx.clearRect(
         0,
@@ -984,10 +939,7 @@ function draw() {
     );
 
 
-    /*
-       Grid
-    */
-
+    /* Grid lines */
     ctx.strokeStyle =
         "rgba(255,255,255,.035)";
 
@@ -1034,10 +986,7 @@ function draw() {
     }
 
 
-    /* =================================
-       FOOD
-    ================================= */
-
+    /* Regular Food */
     if (food) {
 
         ctx.fillStyle =
@@ -1067,10 +1016,7 @@ function draw() {
     }
 
 
-    /* =================================
-       BIG FOOD
-    ================================= */
-
+    /* Big Food */
     if (bigFood) {
 
         ctx.fillStyle =
@@ -1127,10 +1073,7 @@ function draw() {
     }
 
 
-    /* =================================
-       POWERUP
-    ================================= */
-
+    /* Powerup */
     if (powerup) {
 
         ctx.fillStyle =
@@ -1187,10 +1130,7 @@ function draw() {
     }
 
 
-    /* =================================
-       SNAKE
-    ================================= */
-
+    /* Snake */
     snake.forEach(
         (part, index) => {
 
@@ -1221,10 +1161,6 @@ function draw() {
 
             ctx.fill();
 
-
-            /*
-               Snake eyes
-            */
 
             if (index === 0) {
 
@@ -1410,16 +1346,8 @@ function gameOver() {
     running = false;
 
 
-    /*
-       Save score
-    */
-
     saveScore();
 
-
-    /*
-       Choose random song
-    */
 
     selectedSong =
         SONGS[
@@ -1429,10 +1357,6 @@ function gameOver() {
             )
         ];
 
-
-    /*
-       Display score
-    */
 
     document
         .getElementById(
@@ -1457,11 +1381,6 @@ function gameOver() {
         }.`;
 
 
-
-    /*
-       Display song title and cover image.
-    */
-
     document
         .getElementById(
             "songTitle"
@@ -1478,10 +1397,6 @@ function gameOver() {
         selectedSong.cover;
 
 
-    /*
-       Load MP3
-    */
-
     const audio =
         document.getElementById(
             "deathAudio"
@@ -1497,28 +1412,15 @@ function gameOver() {
         0;
 
 
-    /*
-       Show game over
-    */
-
     show(
         "gameOverScreen"
     );
 
 
-    /*
-       Try automatic playback
-    */
-
     audio
         .play()
         .catch(
             () => {
-
-                /*
-                   Mobile browsers may
-                   block automatic audio.
-                */
 
             }
         );
@@ -1556,10 +1458,6 @@ function saveScore() {
     });
 
 
-    /*
-       Highest scores first
-    */
-
     board.sort(
 
         (a, b) =>
@@ -1568,10 +1466,6 @@ function saveScore() {
 
     );
 
-
-    /*
-       Keep top 10
-    */
 
     localStorage.setItem(
 
@@ -1712,10 +1606,6 @@ document
                 "click",
                 () => {
 
-                    /*
-                       Remove old selection
-                    */
-
                     document
                         .querySelectorAll(
                             ".color-btn"
@@ -1728,10 +1618,6 @@ document
                                     )
                         );
 
-
-                    /*
-                       Select new color
-                    */
 
                     button.classList.add(
                         "selected"
@@ -1749,7 +1635,75 @@ document
 
 
 /* =====================================================
-   START BUTTON
+   DESKTOP KEYBOARD CONTROLS (ARROWS + WASD)
+===================================================== */
+
+window.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (!running)
+            return;
+
+
+        const key =
+            event.key;
+
+
+        if (
+            key === "ArrowUp" ||
+            key === "w" ||
+            key === "W"
+        ) {
+
+            event.preventDefault();
+
+            setDirection(0, -1);
+
+        }
+
+        else if (
+            key === "ArrowDown" ||
+            key === "s" ||
+            key === "S"
+        ) {
+
+            event.preventDefault();
+
+            setDirection(0, 1);
+
+        }
+
+        else if (
+            key === "ArrowLeft" ||
+            key === "a" ||
+            key === "A"
+        ) {
+
+            event.preventDefault();
+
+            setDirection(-1, 0);
+
+        }
+
+        else if (
+            key === "ArrowRight" ||
+            key === "d" ||
+            key === "D"
+        ) {
+
+            event.preventDefault();
+
+            setDirection(1, 0);
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   BUTTON LISTENERS
 ===================================================== */
 
 document
@@ -1762,10 +1716,6 @@ document
     );
 
 
-/* =====================================================
-   PLAY AGAIN
-===================================================== */
-
 document
     .getElementById(
         "playAgainBtn"
@@ -1775,10 +1725,6 @@ document
         startGame
     );
 
-
-/* =====================================================
-   HOME
-===================================================== */
 
 document
     .getElementById(
@@ -1809,10 +1755,6 @@ document
     );
 
 
-/* =====================================================
-   LEADERBOARD BUTTON
-===================================================== */
-
 document
     .getElementById(
         "leaderboardBtn"
@@ -1833,10 +1775,6 @@ document
     );
 
 
-/* =====================================================
-   CLOSE LEADERBOARD
-===================================================== */
-
 document
     .getElementById(
         "closeLeaderboard"
@@ -1846,10 +1784,6 @@ document
         closeLeaderboard
     );
 
-
-/* =====================================================
-   CLEAR LEADERBOARD
-===================================================== */
 
 document
     .getElementById(
@@ -1881,7 +1815,7 @@ document
 
 
 /* =====================================================
-   SWIPE START
+   SWIPE START (TOUCH DEVICES)
 ===================================================== */
 
 canvas.addEventListener(
@@ -1911,7 +1845,7 @@ canvas.addEventListener(
 
 
 /* =====================================================
-   SWIPE END
+   SWIPE END (TOUCH DEVICES)
 ===================================================== */
 
 canvas.addEventListener(
@@ -1934,10 +1868,6 @@ canvas.addEventListener(
             touchStartY;
 
 
-        /*
-           Ignore tiny movements
-        */
-
         if (
 
             Math.max(
@@ -1952,10 +1882,6 @@ canvas.addEventListener(
         }
 
 
-        /*
-           Horizontal swipe
-        */
-
         if (
 
             Math.abs(dx) >
@@ -1964,10 +1890,6 @@ canvas.addEventListener(
         ) {
 
             if (dx > 0) {
-
-                /*
-                   Swipe RIGHT
-                */
 
                 setDirection(
                     1,
@@ -1978,10 +1900,6 @@ canvas.addEventListener(
 
             else {
 
-                /*
-                   Swipe LEFT
-                */
-
                 setDirection(
                     -1,
                     0
@@ -1991,18 +1909,9 @@ canvas.addEventListener(
 
         }
 
-
-        /*
-           Vertical swipe
-        */
-
         else {
 
             if (dy > 0) {
-
-                /*
-                   Swipe DOWN
-                */
 
                 setDirection(
                     0,
@@ -2012,10 +1921,6 @@ canvas.addEventListener(
             }
 
             else {
-
-                /*
-                   Swipe UP
-                */
 
                 setDirection(
                     0,
