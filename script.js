@@ -10,7 +10,8 @@
 
 const GRID = 20;
 
-const BASE_SPEED = 130;
+/* Base speed lowered to 200ms per move for easier control */
+const BASE_SPEED = 200;
 
 const POWERUP_DURATION = 5000;
 
@@ -114,6 +115,8 @@ let snakeColor = "#ff69b4";
 let snake = [];
 
 let food = null;
+
+let bigFood = null;
 
 let powerup = null;
 
@@ -323,6 +326,8 @@ function startGame() {
 
     powerup = null;
 
+    bigFood = null;
+
 
     powerupEnd = 0;
 
@@ -405,6 +410,107 @@ function spawnFood() {
                 part.x === food.x &&
 
                 part.y === food.y
+
+        )
+
+        ||
+
+        (
+
+            bigFood &&
+
+            bigFood.x === food.x &&
+
+            bigFood.y === food.y
+
+        )
+
+    );
+}
+
+
+/* =====================================================
+   SPAWN BIG FOOD
+===================================================== */
+
+function spawnBigFoodMaybe() {
+
+    /* 30% chance to spawn Big Food */
+    if (Math.random() > 0.30) {
+
+        return;
+
+    }
+
+
+    let tries = 0;
+
+
+    do {
+
+        bigFood = {
+
+            x:
+                Math.floor(
+                    Math.random() *
+                    GRID
+                ),
+
+            y:
+                Math.floor(
+                    Math.random() *
+                    GRID
+                ),
+
+            /* Random points bonus between 1 and 5 */
+            points: Math.floor(Math.random() * 5) + 1
+
+        };
+
+
+        tries++;
+
+    }
+
+    while (
+
+        tries < 100 &&
+
+        (
+
+            snake.some(
+
+                part =>
+
+                    part.x === bigFood.x &&
+
+                    part.y === bigFood.y
+
+            )
+
+            ||
+
+            (
+
+                food &&
+
+                food.x === bigFood.x &&
+
+                food.y === bigFood.y
+
+            )
+
+            ||
+
+            (
+
+                powerup &&
+
+                powerup.x === bigFood.x &&
+
+                powerup.y === bigFood.y
+
+            )
 
         )
 
@@ -491,6 +597,18 @@ function spawnPowerupMaybe() {
 
                 food.y ===
                 powerup.y
+
+            )
+
+            ||
+
+            (
+
+                bigFood &&
+
+                bigFood.x === powerup.x &&
+
+                bigFood.y === powerup.y
 
             )
 
@@ -639,8 +757,11 @@ function update() {
     );
 
 
+    let ateFood = false;
+
+
     /* =================================
-       FOOD
+       REGULAR FOOD
     ================================= */
 
     if (
@@ -653,11 +774,6 @@ function update() {
 
     ) {
 
-        /*
-           EXACTLY ONE POINT
-           PER FOOD
-        */
-
         score += 1;
 
 
@@ -669,14 +785,54 @@ function update() {
             score;
 
 
+        ateFood = true;
+
+
         spawnFood();
+
+
+        spawnBigFoodMaybe();
 
 
         spawnPowerupMaybe();
 
     }
 
-    else {
+
+    /* =================================
+       BIG FOOD
+    ================================= */
+
+    else if (
+
+        bigFood &&
+
+        newHead.x === bigFood.x &&
+
+        newHead.y === bigFood.y
+
+    ) {
+
+        score += bigFood.points;
+
+
+        document
+            .getElementById(
+                "score"
+            )
+            .textContent =
+            score;
+
+
+        ateFood = true;
+
+
+        bigFood = null;
+
+    }
+
+
+    if (!ateFood) {
 
         snake.pop();
 
@@ -907,6 +1063,66 @@ function draw() {
 
 
         ctx.fill();
+
+    }
+
+
+    /* =================================
+       BIG FOOD
+    ================================= */
+
+    if (bigFood) {
+
+        ctx.fillStyle =
+            "#f1c40f";
+
+
+        ctx.beginPath();
+
+
+        ctx.arc(
+
+            bigFood.x + 0.5,
+
+            bigFood.y + 0.5,
+
+            0.46,
+
+            0,
+
+            Math.PI * 2
+
+        );
+
+
+        ctx.fill();
+
+
+        ctx.fillStyle =
+            "#050509";
+
+
+        ctx.font =
+            "bold 0.45px Arial";
+
+
+        ctx.textAlign =
+            "center";
+
+
+        ctx.textBaseline =
+            "middle";
+
+
+        ctx.fillText(
+
+            "★",
+
+            bigFood.x + 0.5,
+
+            bigFood.y + 0.5
+
+        );
 
     }
 
