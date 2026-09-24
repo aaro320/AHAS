@@ -96,8 +96,6 @@
                     aria-label="Yellow">
                 </button>
 
-                
-
             </div>
 
 
@@ -111,7 +109,7 @@
             <button
                 id="leaderboardBtn"
                 class="secondary">
-                🏆 Leaderboard
+                Leaderboard
             </button>
 
 
@@ -128,29 +126,28 @@
          GAME SCREEN
     ========================== -->
 
-<section id="gameScreen" class="screen hidden">
+    <section id="gameScreen" class="screen hidden">
 
-    <div class="game-header">
-        <div>
-            🐍 <span id="displayName">Player</span>
+        <div class="game-header">
+            <div>
+                🐍 <span id="displayName">Player</span>
+            </div>
+
+            <div>
+                Score:
+                <span id="score">0</span>
+            </div>
         </div>
 
-        <div>
-            Score:
-            <span id="score">0</span>
+        <div id="gameWrap">
+            <canvas id="gameCanvas"></canvas>
         </div>
-    </div>
 
-    <div id="gameWrap">
-        <canvas id="gameCanvas"></canvas>
-    </div>
+        <div id="powerupInfo">
+            ⚡ Power-up: none
+        </div>
 
-    <div id="powerupInfo">
-        ⚡ Power-up: none
-    </div>
-
-    
-</section>
+    </section>
 
 
     <!-- =========================
@@ -184,7 +181,7 @@
             <div class="song-card">
 
                 <div class="song-picture">
-                    🎵
+                    <img id="songCover" src="" alt="Album Cover">
                 </div>
 
 
@@ -226,7 +223,7 @@
                 id="gameOverLeaderboardBtn"
                 class="secondary">
 
-                🏆 Leaderboard
+                Leaderboard
 
             </button>
 
@@ -265,7 +262,7 @@
 
 
             <h2>
-                🏆 Leaderboard
+                Leaderboard
             </h2>
 
 
