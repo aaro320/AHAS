@@ -29,68 +29,75 @@ const ctx =
 
 
 /* =====================================================
-   SONG LIST
+   SONG LIST (WITH COVERS)
 ===================================================== */
 
 const SONGS = [
 
     {
         title: "Dahil ikaw",
-        file: "dahil-ikaw.mp3"
+        file: "dahil-ikaw.mp3",
+        cover: "assets/dahil-ikaw.jpg"
     },
 
     {
         title: "Buwan",
-        file: "buwan.mp3"
+        file: "buwan.mp3",
+        cover: "assets/buwan.jpg"
     },
 
     {
         title: "Just the Way You Are",
-        file: "just-the-way-you-are.mp3"
+        file: "just-the-way-you-are.mp3",
+        cover: "assets/just-the-way-you-are.jpg"
     },
 
     {
         title: "Beautiful",
-        file: "beautiful.mp3"
+        file: "beautiful.mp3",
+        cover: "assets/beautiful.jpg"
     },
 
     {
         title: "Naiilang",
-        file: "naiilang.mp3"
+        file: "naiilang.mp3",
+        cover: "assets/naiilang.jpg"
     },
 
     {
         title: "Maria Clara",
-        file: "maria-clara.mp3"
+        file: "maria-clara.mp3",
+        cover: "assets/maria-clara.jpg"
     },
 
     {
         title: "Inaasam",
-        file: "inaasam.mp3"
+        file: "inaasam.mp3",
+        cover: "assets/inaasam.jpg"
     },
 
     {
-        title:
-            "Merry Christmas, I Miss You!",
-        file:
-            "merry-christmas-i-miss-you.mp3"
+        title: "Merry Christmas, I Miss You!",
+        file: "merry-christmas-i-miss-you.mp3",
+        cover: "assets/merry-christmas-i-miss-you.jpg"
     },
 
     {
-        title:
-            "Merry Christmas, Please Don't Call!",
-        file:
-            "merry-christmas-please-dont-call.mp3"
+        title: "Merry Christmas, Please Don't Call!",
+        file: "merry-christmas-please-dont-call.mp3",
+        cover: "assets/merry-christmas-please-dont-call.jpg"
     },
 
     {
         title: "What If I Call",
-        file: "what-if-i-call.mp3"
+        file: "what-if-i-call.mp3",
+        cover: "assets/what-if-i-call.jpg"
     },
 
     {
         title: "Perfect",
-        file: "perfect.mp3"
+        file: "perfect.mp3",
+        cover: "assets/perfect.jpg"
     }
 
 ];
@@ -1236,10 +1243,7 @@ function gameOver() {
 
 
     /*
-       Display ONLY
-       song title.
-       
-       NO LYRICS.
+       Display song title and cover image.
     */
 
     document
@@ -1248,6 +1252,14 @@ function gameOver() {
         )
         .textContent =
         selectedSong.title;
+
+
+    document
+        .getElementById(
+            "songCover"
+        )
+        .src =
+        selectedSong.cover;
 
 
     /*
