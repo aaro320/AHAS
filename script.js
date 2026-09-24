@@ -13,7 +13,7 @@ const GRID = 20;
 /* Base speed set to 200ms per move for easier initial control */
 const BASE_SPEED = 200;
 
-const POWERUP_DURATION = 5000;
+const POWERUP_DURATION = 6000;
 
 
 /* =====================================================
@@ -114,7 +114,8 @@ let snakeColor = "#ff69b4";
 
 let snake = [];
 
-let food = null;
+/* Food can now hold multiple items (for Food Bomb) */
+let foods = [];
 
 let bigFood = null;
 
@@ -142,6 +143,12 @@ let lastMove = 0;
 let speed = BASE_SPEED;
 
 let powerupEnd = 0;
+
+let activePowerupType = null;
+
+let hasShield = false;
+
+let pointMultiplier = 1;
 
 
 let touchStartX = 0;
@@ -328,6 +335,14 @@ function startGame() {
 
     bigFood = null;
 
+    activePowerupType = null;
+
+    hasShield = false;
+
+    pointMultiplier = 1;
+
+    foods = [];
+
 
     powerupEnd = 0;
 
@@ -381,9 +396,11 @@ function startGame() {
 
 function spawnFood() {
 
+    let newFood;
+
     do {
 
-        food = {
+        newFood = {
 
             x:
                 Math.floor(
@@ -407,9 +424,9 @@ function spawnFood() {
 
             part =>
 
-                part.x === food.x &&
+                part.x === newFood.x &&
 
-                part.y === food.y
+                part.y === newFood.y
 
         )
 
@@ -419,13 +436,24 @@ function spawnFood() {
 
             bigFood &&
 
-            bigFood.x === food.x &&
+            bigFood.x === newFood.x &&
 
-            bigFood.y === food.y
+            bigFood.y === newFood.y
+
+        )
+
+        ||
+
+        foods.some(
+
+            f => f.x === newFood.x && f.y === newFood.y
 
         )
 
     );
+
+
+    foods.push(newFood);
 }
 
 
@@ -436,6 +464,7 @@ function spawnFood() {
 function spawnBigFoodMaybe() {
 
     /* 30% chance to spawn Big Food */
+
     if (Math.random() > 0.30) {
 
         return;
@@ -463,6 +492,7 @@ function spawnBigFoodMaybe() {
                 ),
 
             /* Random points bonus between 1 and 5 */
+
             points: Math.floor(Math.random() * 5) + 1
 
         };
@@ -490,13 +520,13 @@ function spawnBigFoodMaybe() {
 
             ||
 
-            (
+            foods.some(
 
-                food &&
+                f =>
 
-                food.x === bigFood.x &&
+                    f.x === bigFood.x &&
 
-                food.y === bigFood.y
+                    f.y === bigFood.y
 
             )
 
@@ -524,9 +554,10 @@ function spawnBigFoodMaybe() {
 
 function spawnPowerupMaybe() {
 
-    /* 25% chance */
+    /* 30% chance */
+
     if (
-        Math.random() > 0.25
+        Math.random() > 0.30
     ) {
 
         powerup = null;
@@ -537,6 +568,10 @@ function spawnPowerupMaybe() {
 
 
     let tries = 0;
+
+    const types = ["shield", "ghost", "magnet", "speed", "bomb"];
+
+    const chosenType = types[Math.floor(Math.random() * types.length)];
 
 
     do {
@@ -555,13 +590,12 @@ function spawnPowerupMaybe() {
                     GRID
                 ),
 
-            type: "slow"
+            type: chosenType
 
         };
 
 
         tries++;
-
 
     }
 
@@ -585,15 +619,15 @@ function spawnPowerupMaybe() {
 
             ||
 
-            (
+            foods.some(
 
-                food &&
+                f =>
 
-                food.x ===
-                powerup.x &&
+                    f.x ===
+                    powerup.x &&
 
-                food.y ===
-                powerup.y
+                    f.y ===
+                    powerup.y
 
             )
 
@@ -616,6 +650,48 @@ function spawnPowerupMaybe() {
 
 
 /* =====================================================
+   FOOD MAGNET LOGIC
+===================================================== */
+
+function applyMagnetEffect() {
+
+    const head = snake[0];
+
+
+    /* Pull regular food 1 tile closer */
+
+    foods.forEach(f => {
+
+        if (f.x < head.x) f.x++;
+
+        else if (f.x > head.x) f.x--;
+
+
+        if (f.y < head.y) f.y++;
+
+        else if (f.y > head.y) f.y--;
+
+    });
+
+
+    /* Pull big food 1 tile closer */
+
+    if (bigFood) {
+
+        if (bigFood.x < head.x) bigFood.x++;
+
+        else if (bigFood.x > head.x) bigFood.x--;
+
+
+        if (bigFood.y < head.y) bigFood.y++;
+
+        else if (bigFood.y > head.y) bigFood.y--;
+
+    }
+}
+
+
+/* =====================================================
    CHANGE DIRECTION
 ===================================================== */
 
@@ -629,6 +705,7 @@ function setDirection(
 
 
     /* Prevent opposite direction */
+
     if (
 
         x === -direction.x &&
@@ -679,7 +756,7 @@ function update() {
         snake[0];
 
 
-    const newHead = {
+    let newHead = {
 
         x:
             head.x +
@@ -692,8 +769,18 @@ function update() {
     };
 
 
-    /* Wall collision */
-    if (
+    /* Magnet Power-up Effect */
+
+    if (activePowerupType === "magnet") {
+
+        applyMagnetEffect();
+
+    }
+
+
+    /* Wall Check */
+
+    let hitWall =
 
         newHead.x < 0 ||
 
@@ -701,19 +788,31 @@ function update() {
 
         newHead.y < 0 ||
 
-        newHead.y >= GRID
+        newHead.y >= GRID;
 
-    ) {
 
-        gameOver();
+    /* Ghost Mode Wall Wrap */
 
-        return;
+    if (hitWall && activePowerupType === "ghost") {
+
+        if (newHead.x < 0) newHead.x = GRID - 1;
+
+        else if (newHead.x >= GRID) newHead.x = 0;
+
+
+        if (newHead.y < 0) newHead.y = GRID - 1;
+
+        else if (newHead.y >= GRID) newHead.y = 0;
+
+
+        hitWall = false;
 
     }
 
 
-    /* Self collision */
-    if (
+    /* Self Collision Check */
+
+    const hitSelf =
 
         snake.some(
 
@@ -725,13 +824,42 @@ function update() {
                 part.y ===
                 newHead.y
 
-        )
+        );
 
-    ) {
 
-        gameOver();
+    if (hitWall || hitSelf) {
 
-        return;
+        if (hasShield) {
+
+            /* Shield absorbs collision */
+
+            hasShield = false;
+
+
+            document
+
+                .getElementById(
+
+                    "powerupInfo"
+
+                )
+
+                .textContent =
+
+                "🛡️ Shield Broke!";
+
+
+            return;
+
+        }
+
+        else {
+
+            gameOver();
+
+            return;
+
+        }
 
     }
 
@@ -744,32 +872,38 @@ function update() {
     let ateFood = false;
 
 
-    /* Regular food */
-    if (
+    /* Regular food collision */
 
-        food &&
+    const foodIndex = foods.findIndex(
 
-        newHead.x === food.x &&
+        f => f.x === newHead.x && f.y === newHead.y
 
-        newHead.y === food.y
+    );
 
-    ) {
 
-        score += 1;
+    if (foodIndex !== -1) {
+
+        score += 1 * pointMultiplier;
 
 
         document
-            .getElementById(
-                "score"
-            )
-            .textContent =
-            score;
+
+            .getElementById("score")
+
+            .textContent = score;
+
+
+        foods.splice(foodIndex, 1);
 
 
         ateFood = true;
 
 
-        spawnFood();
+        if (foods.length === 0) {
+
+            spawnFood();
+
+        }
 
 
         spawnBigFoodMaybe();
@@ -780,7 +914,8 @@ function update() {
     }
 
 
-    /* Big food */
+    /* Big food collision */
+
     else if (
 
         bigFood &&
@@ -791,15 +926,14 @@ function update() {
 
     ) {
 
-        score += bigFood.points;
+        score += bigFood.points * pointMultiplier;
 
 
         document
-            .getElementById(
-                "score"
-            )
-            .textContent =
-            score;
+
+            .getElementById("score")
+
+            .textContent = score;
 
 
         ateFood = true;
@@ -817,34 +951,68 @@ function update() {
     }
 
 
-    /* Power-up */
+    /* Collect Power-up */
+
     if (
 
         powerup &&
 
-        newHead.x ===
-        powerup.x &&
+        newHead.x === powerup.x &&
 
-        newHead.y ===
-        powerup.y
+        newHead.y === powerup.y
 
     ) {
 
-        speed =
-            BASE_SPEED * 1.65;
+        activePowerupType = powerup.type;
 
 
-        powerupEnd =
-            performance.now() +
-            POWERUP_DURATION;
+        if (powerup.type === "shield") {
 
+            hasShield = true;
 
-        document
-            .getElementById(
-                "powerupInfo"
-            )
-            .textContent =
-            "🐌 Slow power-up active!";
+            document.getElementById("powerupInfo").textContent = "🛡️ Shield Active!";
+
+        }
+
+        else if (powerup.type === "ghost") {
+
+            powerupEnd = performance.now() + 8000;
+
+            document.getElementById("powerupInfo").textContent = "👻 Ghost Mode Active!";
+
+        }
+
+        else if (powerup.type === "magnet") {
+
+            powerupEnd = performance.now() + POWERUP_DURATION;
+
+            document.getElementById("powerupInfo").textContent = "🧲 Magnet Active!";
+
+        }
+
+        else if (powerup.type === "speed") {
+
+            speed = 110;
+
+            pointMultiplier = 2;
+
+            powerupEnd = performance.now() + POWERUP_DURATION;
+
+            document.getElementById("powerupInfo").textContent = "⚡ Speed 2x Points Active!";
+
+        }
+
+        else if (powerup.type === "bomb") {
+
+            for (let i = 0; i < 5; i++) {
+
+                spawnFood();
+
+            }
+
+            document.getElementById("powerupInfo").textContent = "💣 Food Bomb Exploded!";
+
+        }
 
 
         powerup = null;
@@ -864,6 +1032,8 @@ function gameLoop(now) {
         return;
 
 
+    /* Expire Timed Power-ups */
+
     if (
 
         powerupEnd &&
@@ -872,19 +1042,20 @@ function gameLoop(now) {
 
     ) {
 
-        speed =
-            BASE_SPEED;
+        speed = BASE_SPEED;
 
+        pointMultiplier = 1;
 
         powerupEnd = 0;
 
+        activePowerupType = null;
+
 
         document
-            .getElementById(
-                "powerupInfo"
-            )
-            .textContent =
-            "⚡ Power-up: none";
+
+            .getElementById("powerupInfo")
+
+            .textContent = "⚡ Power-up: none";
 
     }
 
@@ -898,8 +1069,7 @@ function gameLoop(now) {
         update();
 
 
-        lastMove =
-            now;
+        lastMove = now;
 
     }
 
@@ -940,6 +1110,7 @@ function draw() {
 
 
     /* Grid lines */
+
     ctx.strokeStyle =
         "rgba(255,255,255,.035)";
 
@@ -986,161 +1157,133 @@ function draw() {
     }
 
 
-    /* Regular Food */
-    if (food) {
+    /* Regular Foods */
 
-        ctx.fillStyle =
-            "#e74c3c";
+    foods.forEach(f => {
 
+        ctx.fillStyle = "#e74c3c";
 
         ctx.beginPath();
 
-
-        ctx.arc(
-
-            food.x + 0.5,
-
-            food.y + 0.5,
-
-            0.34,
-
-            0,
-
-            Math.PI * 2
-
-        );
-
+        ctx.arc(f.x + 0.5, f.y + 0.5, 0.34, 0, Math.PI * 2);
 
         ctx.fill();
 
-    }
+    });
 
 
     /* Big Food */
+
     if (bigFood) {
 
-        ctx.fillStyle =
-            "#f1c40f";
-
+        ctx.fillStyle = "#f1c40f";
 
         ctx.beginPath();
 
-
-        ctx.arc(
-
-            bigFood.x + 0.5,
-
-            bigFood.y + 0.5,
-
-            0.46,
-
-            0,
-
-            Math.PI * 2
-
-        );
-
+        ctx.arc(bigFood.x + 0.5, bigFood.y + 0.5, 0.46, 0, Math.PI * 2);
 
         ctx.fill();
 
 
-        ctx.fillStyle =
-            "#050509";
+        ctx.fillStyle = "#050509";
 
+        ctx.font = "bold 0.45px Arial";
 
-        ctx.font =
-            "bold 0.45px Arial";
+        ctx.textAlign = "center";
 
+        ctx.textBaseline = "middle";
 
-        ctx.textAlign =
-            "center";
-
-
-        ctx.textBaseline =
-            "middle";
-
-
-        ctx.fillText(
-
-            "★",
-
-            bigFood.x + 0.5,
-
-            bigFood.y + 0.5
-
-        );
+        ctx.fillText("★", bigFood.x + 0.5, bigFood.y + 0.5);
 
     }
 
 
-    /* Powerup */
+    /* Powerup Rendering */
+
     if (powerup) {
 
-        ctx.fillStyle =
-            "#4dd0e1";
+        let symbol = "⚡";
+
+
+        if (powerup.type === "shield") {
+
+            ctx.fillStyle = "#00e676";
+
+            symbol = "🛡";
+
+        } else if (powerup.type === "ghost") {
+
+            ctx.fillStyle = "#9c27b0";
+
+            symbol = "👻";
+
+        } else if (powerup.type === "magnet") {
+
+            ctx.fillStyle = "#29b6f6";
+
+            symbol = "🧲";
+
+        } else if (powerup.type === "speed") {
+
+            ctx.fillStyle = "#ffeb3b";
+
+            symbol = "⚡";
+
+        } else if (powerup.type === "bomb") {
+
+            ctx.fillStyle = "#ff1744";
+
+            symbol = "💣";
+
+        }
 
 
         ctx.beginPath();
 
-
-        ctx.arc(
-
-            powerup.x + 0.5,
-
-            powerup.y + 0.5,
-
-            0.30,
-
-            0,
-
-            Math.PI * 2
-
-        );
-
+        ctx.arc(powerup.x + 0.5, powerup.y + 0.5, 0.30, 0, Math.PI * 2);
 
         ctx.fill();
 
 
-        ctx.fillStyle =
-            "#06151a";
+        ctx.fillStyle = "#06151a";
 
+        ctx.font = "0.45px Arial";
 
-        ctx.font =
-            "0.45px Arial";
+        ctx.textAlign = "center";
 
+        ctx.textBaseline = "middle";
 
-        ctx.textAlign =
-            "center";
-
-
-        ctx.textBaseline =
-            "middle";
-
-
-        ctx.fillText(
-
-            "S",
-
-            powerup.x + 0.5,
-
-            powerup.y + 0.5
-
-        );
+        ctx.fillText(symbol, powerup.x + 0.5, powerup.y + 0.5);
 
     }
 
 
-    /* Snake */
+    /* Snake Rendering */
+
     snake.forEach(
         (part, index) => {
 
-            ctx.fillStyle =
-                snakeColor;
+            if (index === 0 && hasShield) {
+
+                ctx.fillStyle = "#00e676";
+
+            } else if (activePowerupType === "ghost") {
+
+                ctx.fillStyle = "rgba(156, 39, 176, 0.75)";
+
+            } else {
+
+                ctx.fillStyle = snakeColor;
+
+            }
 
 
             const pad =
+
                 index === 0
+
                     ? 0.04
+
                     : 0.09;
 
 
