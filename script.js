@@ -97,7 +97,7 @@ const SONGS = [
     {
         title: "Perfect",
         file: "perfect.mp3",
-        cover: "assets/perfect.png"
+        cover: "assets/perfect.jpg"
     }
 
 ];
